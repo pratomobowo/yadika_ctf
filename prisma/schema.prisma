@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(cuid())
+  fullName  String
+  discord   String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+  progress  Progress[]
+}
+
+model Progress {
+  id          String   @id @default(cuid())
+  userId      String
+  level       Int
+  flag        String
+  completedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, level])
+}

@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --background: #0a0a0c;
+  --foreground: #e1e1e6;
+  --primary: #00ff9f;
+  --secondary: #00b8ff;
+  --accent: #ff0055;
+  --terminal-green: #00ff41;
+}
+
+@theme {
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-terminal: var(--terminal-green);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.glow-text {
+  text-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+}
+
+.terminal-border {
+  border: 1px solid rgba(0, 255, 65, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+}
