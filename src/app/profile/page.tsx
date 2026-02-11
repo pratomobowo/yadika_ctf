@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { User, Shield, CheckCircle2, Circle, Lock, KeyRound, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
+import { SessionLayout } from '@/components/layouts/SessionLayout';
 
 const levels = [
     { id: 1, title: 'Welcome to the Shell', skill: 'Navigasi Filesystem' },
@@ -93,200 +94,190 @@ export default function ProfilePage() {
     const progressPercent = Math.round((completedCount / totalLevels) * 100);
 
     return (
-        <div className="min-h-screen bg-[#0a0a0c] text-foreground">
-            {/* Header */}
-            <div className="border-b border-terminal/10 bg-[#111113]">
-                <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <Link href="/play/1" className="flex items-center gap-2 text-terminal/60 hover:text-terminal transition-colors">
-                        <ArrowLeft size={18} />
-                        <span className="font-mono text-sm">Kembali ke Challenge</span>
-                    </Link>
-                    <span className="text-primary font-bold tracking-wider text-sm font-mono">PROFILE</span>
-                </div>
-            </div>
-
-            <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+        <SessionLayout title="User Profile" currentLevel={0} showObjectives={false}>
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
                 {/* User Info Card */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-[#111113] border border-terminal/10 rounded-xl p-6"
+                    className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6"
                 >
                     <div className="flex items-center gap-4 mb-6">
-                        <div className="w-16 h-16 rounded-full bg-terminal/10 flex items-center justify-center text-terminal border-2 border-terminal/30">
-                            <User size={32} />
+                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary border-2 border-primary/30 shrink-0">
+                            <User size={24} className="md:w-8 md:h-8" />
                         </div>
-                        <div>
-                            <h1 className="text-xl font-bold text-foreground">{user.fullName}</h1>
-                            <p className="text-terminal/60 font-mono text-sm">@{user.discord}</p>
+                        <div className="min-w-0">
+                            <h1 className="text-lg md:text-xl font-bold text-foreground truncate">{user.fullName}</h1>
+                            <p className="text-primary/60 font-mono text-[10px] md:text-sm truncate">@{user.discord}</p>
                         </div>
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="mb-2 flex items-center justify-between text-sm">
-                        <span className="text-foreground/60 font-mono">Progress Keseluruhan</span>
-                        <span className="text-terminal font-mono font-bold">{completedCount}/{totalLevels} ({progressPercent}%)</span>
+                    <div className="mb-2 flex items-center justify-between text-[10px] md:text-sm">
+                        <span className="text-foreground/60 font-mono uppercase tracking-wider">Progress Keseluruhan</span>
+                        <span className="text-primary font-mono font-bold">{completedCount}/{totalLevels} ({progressPercent}%)</span>
                     </div>
-                    <div className="w-full h-3 bg-[#0a0a0c] rounded-full overflow-hidden border border-terminal/10">
+                    <div className="w-full h-2.5 md:h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPercent}%` }}
                             transition={{ duration: 1, ease: 'easeOut' }}
-                            className="h-full bg-gradient-to-r from-terminal/80 to-primary rounded-full"
+                            className="h-full bg-gradient-to-r from-primary/80 to-secondary rounded-full"
                         />
                     </div>
                 </motion.div>
 
-                {/* Level Progress */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="bg-[#111113] border border-terminal/10 rounded-xl p-6"
-                >
-                    <div className="flex items-center gap-2 mb-4">
-                        <Shield size={20} className="text-primary" />
-                        <h2 className="text-lg font-bold font-mono">Level Progress</h2>
-                    </div>
+                <div className="grid lg:grid-cols-2 gap-4 md:gap-6">
+                    {/* Level Progress */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6"
+                    >
+                        <div className="flex items-center gap-2 mb-4">
+                            <Shield size={18} className="text-primary" />
+                            <h2 className="text-sm md:text-lg font-bold font-mono uppercase tracking-tight">Level Progress</h2>
+                        </div>
 
-                    <div className="space-y-3">
-                        {levels.map((lvl) => {
-                            const completed = isLevelCompleted(lvl.id);
-                            const unlocked = isLevelUnlocked(lvl.id);
-                            const completionData = user.progress.find(p => p.level === lvl.id);
+                        <div className="space-y-2">
+                            {levels.map((lvl) => {
+                                const completed = isLevelCompleted(lvl.id);
+                                const unlocked = isLevelUnlocked(lvl.id);
+                                const completionData = user.progress.find(p => p.level === lvl.id);
 
-                            return (
-                                <div
-                                    key={lvl.id}
-                                    className={`flex items-center gap-4 p-3 rounded-lg border transition-colors ${completed
+                                return (
+                                    <div
+                                        key={lvl.id}
+                                        className={`flex items-center gap-3 p-2.5 rounded-lg border transition-colors ${completed
                                             ? 'border-green-500/20 bg-green-500/5'
                                             : unlocked
-                                                ? 'border-terminal/10 bg-terminal/5'
+                                                ? 'border-white/10 bg-white/5'
                                                 : 'border-white/5 bg-white/[0.02] opacity-50'
-                                        }`}
-                                >
-                                    <div className="shrink-0">
-                                        {completed ? (
-                                            <CheckCircle2 size={22} className="text-green-500" />
-                                        ) : unlocked ? (
-                                            <Circle size={22} className="text-terminal/40" />
-                                        ) : (
-                                            <Lock size={22} className="text-foreground/20" />
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-mono text-sm font-bold text-foreground/80">Level {lvl.id}</span>
-                                            <span className="text-foreground/40">•</span>
-                                            <span className="text-sm text-foreground/60 truncate">{lvl.title}</span>
+                                            }`}
+                                    >
+                                        <div className="shrink-0">
+                                            {completed ? (
+                                                <CheckCircle2 size={18} className="text-green-500" />
+                                            ) : unlocked ? (
+                                                <Circle size={18} className="text-white/20" />
+                                            ) : (
+                                                <Lock size={16} className="text-foreground/20" />
+                                            )}
                                         </div>
-                                        <div className="text-xs text-foreground/30 font-mono mt-0.5">{lvl.skill}</div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="font-mono text-[11px] md:text-xs font-bold text-foreground/80">Lvl {lvl.id}</span>
+                                                <span className="text-xs text-foreground/60 truncate">{lvl.title}</span>
+                                            </div>
+                                            <div className="text-[10px] text-foreground/30 font-mono mt-0.5">{lvl.skill}</div>
+                                        </div>
+                                        <div className="shrink-0 text-right">
+                                            {completed && completionData ? (
+                                                <span className="text-[10px] text-green-400/60 font-mono">
+                                                    {new Date(completionData.completedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                                                </span>
+                                            ) : unlocked ? (
+                                                <Link href={`/play/${lvl.id}`} className="text-[10px] text-primary hover:underline font-mono">
+                                                    Mulai →
+                                                </Link>
+                                            ) : (
+                                                <span className="text-[10px] text-foreground/20 font-mono font-bold italic">LOCKED</span>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="shrink-0 text-right">
-                                        {completed && completionData ? (
-                                            <span className="text-xs text-green-400/60 font-mono">
-                                                {new Date(completionData.completedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                                            </span>
-                                        ) : unlocked ? (
-                                            <Link href={`/play/${lvl.id}`} className="text-xs text-terminal hover:underline font-mono">
-                                                Mulai →
-                                            </Link>
-                                        ) : (
-                                            <span className="text-xs text-foreground/20 font-mono">Terkunci</span>
-                                        )}
-                                    </div>
+                                );
+                            })}
+                        </div>
+                    </motion.div>
+
+                    {/* Change Password */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6 h-fit"
+                    >
+                        <div className="flex items-center gap-2 mb-4">
+                            <KeyRound size={18} className="text-primary" />
+                            <h2 className="text-sm md:text-lg font-bold font-mono uppercase tracking-tight">Ganti Password</h2>
+                        </div>
+
+                        <form onSubmit={handleChangePassword} className="space-y-4">
+                            <div>
+                                <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Password Lama</label>
+                                <div className="relative">
+                                    <input
+                                        type={showCurrentPass ? 'text' : 'password'}
+                                        value={currentPassword}
+                                        onChange={(e) => setCurrentPassword(e.target.value)}
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors pr-10"
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCurrentPass(!showCurrentPass)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
+                                    >
+                                        {showCurrentPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                                    </button>
                                 </div>
-                            );
-                        })}
-                    </div>
-                </motion.div>
+                            </div>
 
-                {/* Change Password */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="bg-[#111113] border border-terminal/10 rounded-xl p-6"
-                >
-                    <div className="flex items-center gap-2 mb-4">
-                        <KeyRound size={20} className="text-primary" />
-                        <h2 className="text-lg font-bold font-mono">Ganti Password</h2>
-                    </div>
+                            <div>
+                                <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Password Baru</label>
+                                <div className="relative">
+                                    <input
+                                        type={showNewPass ? 'text' : 'password'}
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors pr-10"
+                                        placeholder="••••••••"
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowNewPass(!showNewPass)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
+                                    >
+                                        {showNewPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                                    </button>
+                                </div>
+                            </div>
 
-                    <form onSubmit={handleChangePassword} className="space-y-4 max-w-md">
-                        <div>
-                            <label className="block text-xs text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Password Lama</label>
-                            <div className="relative">
+                            <div>
+                                <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Konfirmasi Password Baru</label>
                                 <input
-                                    type={showCurrentPass ? 'text' : 'password'}
-                                    value={currentPassword}
-                                    onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className="w-full bg-[#0a0a0c] border border-terminal/10 rounded-lg px-4 py-2.5 text-sm font-mono text-foreground focus:outline-none focus:border-terminal/40 transition-colors pr-10"
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors"
                                     placeholder="••••••••"
                                     required
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowCurrentPass(!showCurrentPass)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
-                                >
-                                    {showCurrentPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
                             </div>
-                        </div>
 
-                        <div>
-                            <label className="block text-xs text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Password Baru</label>
-                            <div className="relative">
-                                <input
-                                    type={showNewPass ? 'text' : 'password'}
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full bg-[#0a0a0c] border border-terminal/10 rounded-lg px-4 py-2.5 text-sm font-mono text-foreground focus:outline-none focus:border-terminal/40 transition-colors pr-10"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowNewPass(!showNewPass)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
-                                >
-                                    {showNewPass ? <EyeOff size={16} /> : <Eye size={16} />}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-xs text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Konfirmasi Password Baru</label>
-                            <input
-                                type="password"
-                                value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full bg-[#0a0a0c] border border-terminal/10 rounded-lg px-4 py-2.5 text-sm font-mono text-foreground focus:outline-none focus:border-terminal/40 transition-colors"
-                                placeholder="••••••••"
-                                required
-                            />
-                        </div>
-
-                        {passwordMessage && (
-                            <div className={`text-sm font-mono p-3 rounded-lg border ${passwordStatus === 'success'
+                            {passwordMessage && (
+                                <div className={`text-[10px] md:text-xs font-mono p-3 rounded-lg border ${passwordStatus === 'success'
                                     ? 'text-green-400 bg-green-500/5 border-green-500/20'
                                     : 'text-red-400 bg-red-500/5 border-red-500/20'
-                                }`}>
-                                {passwordStatus === 'success' ? '✓' : '✗'} {passwordMessage}
-                            </div>
-                        )}
+                                    }`}>
+                                    {passwordStatus === 'success' ? '✓' : '✗'} {passwordMessage}
+                                </div>
+                            )}
 
-                        <button
-                            type="submit"
-                            disabled={passwordStatus === 'submitting'}
-                            className="w-full bg-terminal/10 border border-terminal/20 text-terminal font-mono text-sm py-2.5 rounded-lg hover:bg-terminal/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {passwordStatus === 'submitting' ? 'Mengubah...' : 'Ubah Password'}
-                        </button>
-                    </form>
-                </motion.div>
+                            <button
+                                type="submit"
+                                disabled={passwordStatus === 'submitting'}
+                                className="w-full bg-primary/10 border border-primary/20 text-primary font-mono text-xs md:text-sm py-2.5 rounded-lg hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase font-bold tracking-widest"
+                            >
+                                {passwordStatus === 'submitting' ? 'Mengubah...' : 'Simpan Password'}
+                            </button>
+                        </form>
+                    </motion.div>
+                </div>
             </div>
-        </div>
+        </SessionLayout>
     );
 }

@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
             id: user.id,
             discord: user.discord,
             fullName: user.fullName,
+            role: user.role,
         });
 
         return NextResponse.json({
@@ -60,6 +61,7 @@ export async function POST(request: NextRequest) {
                 id: user.id,
                 fullName: user.fullName,
                 discord: user.discord,
+                role: user.role,
             },
         });
     } catch (error) {

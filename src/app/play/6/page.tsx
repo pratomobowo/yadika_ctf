@@ -44,28 +44,28 @@ export default function Level6() {
     return (
         <SessionLayout title="Level 6: Process Hunting" currentLevel={6} showObjectives={false}>
             <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
-                    <p className="text-xs text-foreground/50 font-mono">
+                <div className="px-3 md:px-4 py-2 md:py-3 border-b border-white/5 flex items-center justify-between">
+                    <p className="text-[10px] md:text-xs text-foreground/50 font-mono flex-1 mr-4">
                         Cari Process ID (PID) atau flag dari "hacker_service". Format: <code className="text-primary">yadika{'{...}'}</code>
                     </p>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                         {alreadyCompleted && (
-                            <span className="flex items-center gap-1 text-green-400 bg-green-500/10 px-2 py-1 rounded text-xs">
-                                <CheckCircle2 size={12} /> Solved
+                            <span className="flex items-center gap-0.5 md:gap-1 text-green-400 bg-green-500/10 px-1.5 md:px-2 py-0.5 md:py-1 rounded text-[10px] md:text-xs">
+                                <CheckCircle2 size={10} className="md:w-3 md:h-3" /> Solved
                             </span>
                         )}
-                        <span className="text-xs text-amber-400/60 font-mono">+20 pts</span>
+                        <span className="text-[10px] md:text-xs text-amber-400/60 font-mono">+20 pts</span>
                     </div>
                 </div>
 
-                <div className="flex-1 p-4 overflow-hidden">
+                <div className="flex-1 p-3 md:p-4 overflow-hidden">
                     <Level6Terminal onFlagFound={handleFlagFound} />
                 </div>
 
-                <div className="px-4 py-3 border-t border-white/5">
+                <div className="px-3 md:px-4 py-2 md:py-3 border-t border-white/5">
                     {flagFound && !alreadyCompleted && (
                         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                            className="text-green-400 text-xs font-mono mb-2 flex items-center gap-1">
+                            className="text-green-400 text-[10px] md:text-xs font-mono mb-1.5 md:mb-2 flex items-center gap-1">
                             <CheckCircle2 size={12} /> Flag terdeteksi!
                         </motion.p>
                     )}
@@ -76,24 +76,24 @@ export default function Level6() {
                             value={flag}
                             onChange={(e) => setFlag(e.target.value)}
                             disabled={status === 'correct'}
-                            className="flex-1 bg-black/50 border border-white/10 rounded px-3 py-2 font-mono text-sm text-primary focus:border-primary outline-none disabled:opacity-50"
+                            className="flex-1 bg-black/50 border border-white/10 rounded px-2 md:px-3 py-1.5 md:py-2 font-mono text-xs md:text-sm text-primary focus:border-primary outline-none disabled:opacity-50"
                         />
                         <button
                             type="submit"
                             disabled={status === 'correct' || status === 'submitting'}
-                            className={`px-4 py-2 rounded font-bold text-sm flex items-center gap-1.5 transition-all ${status === 'correct' ? 'bg-green-500 text-black' : 'bg-primary text-black hover:bg-primary/80'
+                            className={`px-3 md:px-4 py-1.5 md:py-2 rounded font-bold text-xs md:text-sm flex items-center gap-1 md:gap-1.5 transition-all ${status === 'correct' ? 'bg-green-500 text-black' : 'bg-primary text-black hover:bg-primary/80'
                                 }`}
                         >
                             {status === 'correct' ? (
-                                <>SOLVED <CheckCircle2 size={14} /></>
-                            ) : status === 'submitting' ? 'CHECKING...' : (
-                                <>SUBMIT <Send size={14} /></>
+                                <>SOLVED <CheckCircle2 size={12} className="md:w-3.5 md:h-3.5" /></>
+                            ) : status === 'submitting' ? '...' : (
+                                <>SUBMIT <Send size={12} className="md:w-3.5 md:h-3.5" /></>
                             )}
                         </button>
                     </form>
                     {status === 'wrong' && (
-                        <p className="text-accent text-xs mt-1.5 flex items-center gap-1 font-mono">
-                            <Lock size={12} /> Flag salah, coba lagi.
+                        <p className="text-accent text-[10px] md:text-xs mt-1 md:mt-1.5 flex items-center gap-1 font-mono">
+                            <Lock size={10} /> Flag salah.
                         </p>
                     )}
                 </div>

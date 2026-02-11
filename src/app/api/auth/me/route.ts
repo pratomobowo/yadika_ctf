@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { getSession, deleteSession } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
@@ -17,6 +18,7 @@ export async function GET() {
                 id: true,
                 fullName: true,
                 discord: true,
+                role: true,
                 points: true,
                 createdAt: true,
                 progress: {

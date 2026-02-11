@@ -11,6 +11,7 @@ interface User {
     id: string;
     fullName: string;
     discord: string;
+    role: string;
     points: number;
     progress: Progress[];
 }
@@ -35,10 +36,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const refreshUser = useCallback(async () => {
         try {
+            console.log('DEBUG: AuthContext - refreshUser starting fetch...');
             const res = await fetch('/api/auth/me');
+            console.log('DEBUG: AuthContext - refreshUser status:', res.status);
             const data = await res.json();
+            console.log('DEBUG: AuthContext - refreshUser data:', data);
             setUser(data.user || null);
-        } catch {
+        } catch (err) {
+            console.error('DEBUG: AuthContext - refreshUser failed:', err);
             setUser(null);
         } finally {
             setLoading(false);

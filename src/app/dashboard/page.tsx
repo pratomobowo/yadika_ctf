@@ -11,24 +11,24 @@ import {
 } from 'lucide-react';
 
 const sessionModules = [
-    { level: 1001, title: 'Instalasi Ubuntu Server', icon: '💿', href: '/play/session/1' },
-    { level: 1002, title: 'Basic Commands', icon: '⌨️', href: '/play/session/2' },
-    { level: 1003, title: 'File Management', icon: '📁', href: '/play/session/3' },
-    { level: 1004, title: 'Text Editing (Nano)', icon: '📝', href: '/play/session/4' },
-    { level: 1005, title: 'User & Permission', icon: '👤', href: '/play/session/5' },
+    { level: 1001, title: 'Instalasi Ubuntu Server', href: '/play/session/1' },
+    { level: 1002, title: 'Basic Commands', href: '/play/session/2' },
+    { level: 1003, title: 'File Management', href: '/play/session/3' },
+    { level: 1004, title: 'Text Editing (Nano)', href: '/play/session/4' },
+    { level: 1005, title: 'User & Permission', href: '/play/session/5' },
 ];
 
 const ctfLevels = [
-    { level: 1, title: 'Welcome to the Shell', icon: '🐚', href: '/play/1' },
-    { level: 2, title: 'The Hidden Message', icon: '🔐', href: '/play/2' },
-    { level: 3, title: 'Needle in a Haystack', icon: '🔍', href: '/play/3' },
-    { level: 4, title: 'Pipelining', icon: '🔗', href: '/play/4' },
-    { level: 5, title: 'Strict Rules', icon: '🛡️', href: '/play/5' },
-    { level: 6, title: 'Process Hunting', icon: '🎯', href: '/play/6' },
-    { level: 7, title: 'Output Master', icon: '📤', href: '/play/7' },
-    { level: 8, title: 'Environment Secrets', icon: '🌐', href: '/play/8' },
-    { level: 9, title: 'Web Recon', icon: '🕸️', href: '/play/9' },
-    { level: 10, title: 'Bash Script Runner', icon: '📜', href: '/play/10' },
+    { level: 1, title: 'Welcome to the Shell', href: '/play/1' },
+    { level: 2, title: 'The Hidden Message', href: '/play/2' },
+    { level: 3, title: 'Needle in a Haystack', href: '/play/3' },
+    { level: 4, title: 'Pipelining', href: '/play/4' },
+    { level: 5, title: 'Strict Rules', href: '/play/5' },
+    { level: 6, title: 'Process Hunting', href: '/play/6' },
+    { level: 7, title: 'Output Master', href: '/play/7' },
+    { level: 8, title: 'Environment Secrets', href: '/play/8' },
+    { level: 9, title: 'Web Recon', href: '/play/9' },
+    { level: 10, title: 'Bash Script Runner', href: '/play/10' },
 ];
 
 interface LeaderboardEntry {
@@ -89,7 +89,7 @@ export default function DashboardPage() {
 
     return (
         <SessionLayout title="Dashboard" currentLevel={0} showObjectives={false}>
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
                 {/* Points Badge */}
                 <div className="flex items-center justify-between">
                     <div>
@@ -104,30 +104,30 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Stats Row */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0 }}
-                        className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
-                        <Zap size={18} className="text-amber-400 mx-auto mb-1.5" />
-                        <div className="text-xl font-bold text-foreground font-mono">{user.points}</div>
-                        <div className="text-[10px] text-foreground/40 font-mono mt-0.5">Total Poin</div>
+                        className="bg-white/5 border border-white/10 rounded-lg p-2.5 md:p-3 text-center">
+                        <Zap size={16} className="text-amber-400 mx-auto mb-1 md:mb-1.5" />
+                        <div className="text-lg md:text-xl font-bold text-foreground font-mono leading-none">{user.points}</div>
+                        <div className="text-[9px] md:text-[10px] text-foreground/40 font-mono mt-1">Total Poin</div>
                     </motion.div>
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-                        className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
-                        <Target size={18} className="text-primary mx-auto mb-1.5" />
-                        <div className="text-xl font-bold text-foreground font-mono">{totalProgress}/{totalAll}</div>
-                        <div className="text-[10px] text-foreground/40 font-mono mt-0.5">Level Selesai</div>
+                        className="bg-white/5 border border-white/10 rounded-lg p-2.5 md:p-3 text-center">
+                        <Target size={16} className="text-primary mx-auto mb-1 md:mb-1.5" />
+                        <div className="text-lg md:text-xl font-bold text-foreground font-mono leading-none">{totalProgress}/{totalAll}</div>
+                        <div className="text-[9px] md:text-[10px] text-foreground/40 font-mono mt-1">Level Selesai</div>
                     </motion.div>
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                        className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
-                        <BookOpen size={18} className="text-blue-400 mx-auto mb-1.5" />
-                        <div className="text-xl font-bold text-foreground font-mono">{completedModules}/{totalModules}</div>
-                        <div className="text-[10px] text-foreground/40 font-mono mt-0.5">Modul Materi</div>
+                        className="bg-white/5 border border-white/10 rounded-lg p-2.5 md:p-3 text-center">
+                        <BookOpen size={16} className="text-blue-400 mx-auto mb-1 md:mb-1.5" />
+                        <div className="text-lg md:text-xl font-bold text-foreground font-mono leading-none">{completedModules}/{totalModules}</div>
+                        <div className="text-[9px] md:text-[10px] text-foreground/40 font-mono mt-1">Materi</div>
                     </motion.div>
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
-                        className="bg-white/5 border border-white/10 rounded-lg p-3 text-center">
-                        <Shield size={18} className="text-red-400 mx-auto mb-1.5" />
-                        <div className="text-xl font-bold text-foreground font-mono">{completedCTF}/{totalCTF}</div>
-                        <div className="text-[10px] text-foreground/40 font-mono mt-0.5">CTF Level</div>
+                        className="bg-white/5 border border-white/10 rounded-lg p-2.5 md:p-3 text-center">
+                        <Shield size={16} className="text-red-400 mx-auto mb-1 md:mb-1.5" />
+                        <div className="text-lg md:text-xl font-bold text-foreground font-mono leading-none">{completedCTF}/{totalCTF}</div>
+                        <div className="text-[9px] md:text-[10px] text-foreground/40 font-mono mt-1">CTF</div>
                     </motion.div>
                 </div>
 
@@ -169,11 +169,11 @@ export default function DashboardPage() {
                                 const unlocked = isLevelUnlocked(mod.level);
                                 return (
                                     <Link key={mod.level} href={unlocked ? mod.href : '#'}
-                                        className={`flex items-center gap-2.5 p-2.5 rounded-md border transition-all text-xs ${completed ? 'border-green-500/20 bg-green-500/5'
+                                        className={`flex items-center gap-3 p-2.5 rounded-md border transition-all text-xs ${completed ? 'border-green-500/20 bg-green-500/5'
                                             : unlocked ? 'border-white/10 bg-white/5 hover:bg-white/10'
                                                 : 'border-white/5 bg-white/[0.02] opacity-40 pointer-events-none'
                                             }`}>
-                                        <span className="text-sm">{mod.icon}</span>
+                                        <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${completed ? 'bg-green-500' : unlocked ? 'bg-primary/40' : 'bg-white/10'}`} />
                                         <div className="flex-1 min-w-0">
                                             <span className="font-mono text-foreground/80 truncate block">{mod.title}</span>
                                             <span className="text-[10px] text-foreground/30 font-mono">+10 pts</span>

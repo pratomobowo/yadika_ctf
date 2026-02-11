@@ -24,12 +24,12 @@ export default function Home() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary rounded-full blur-[120px]" />
       </div>
 
-      <div className="z-10 w-full max-w-5xl">
-        <header className="text-center mb-12">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter glow-text mb-4 text-primary">
+      <div className="z-10 w-full max-w-5xl px-2 md:px-0">
+        <header className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-7xl font-bold tracking-tighter glow-text mb-2 md:mb-4 text-primary">
             YADIKA CTF
           </h1>
-          <p className="text-lg md:text-xl text-terminal/80 font-mono">
+          <p className="text-sm sm:text-base md:text-xl text-terminal/80 font-mono">
             Elevate your shell skills. Master the system.
           </p>
         </header>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Terminal as TerminalIcon, Check, ChevronRight, ChevronDown, Plus, Trash2, HardDrive, Layout, Server, Database } from 'lucide-react';
+import { Terminal as TerminalIcon, Check, Plus, Trash2, HardDrive, Database } from 'lucide-react';
 
 type Step =
     | 'WELCOME'
@@ -102,7 +102,7 @@ export const UbuntuInstallSimulator: React.FC<{ onComplete: () => void }> = ({ o
         type: 'Ubuntu Server',
         network: 'enp0s3 (DHCP: 192.168.1.50)',
         yourName: 'Cadet',
-        serverName: 'yadika-server',
+        serverName: 'ctf',
         username: 'cadet',
         password: '',
         storageType: 'custom',
@@ -160,7 +160,7 @@ export const UbuntuInstallSimulator: React.FC<{ onComplete: () => void }> = ({ o
             'INSTALLING',
             'FINISH'
         ];
-        const currentIndex = flow.indexOf(step as any);
+        const currentIndex = flow.indexOf(step as Step);
         if (currentIndex < flow.length - 1) {
             setStep(flow[currentIndex + 1]);
         }
@@ -443,7 +443,7 @@ export const UbuntuInstallSimulator: React.FC<{ onComplete: () => void }> = ({ o
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-white/40 block mb-1">Your Server's Name</label>
+                                    <label className="text-white/40 block mb-1">Your Server&apos;s Name</label>
                                     <input
                                         type="text"
                                         value={state.serverName}

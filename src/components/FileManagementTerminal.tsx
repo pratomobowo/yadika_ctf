@@ -391,7 +391,7 @@ export default function FileManagementTerminal({ onComplete }: { onComplete?: ()
             <div className="flex items-center justify-between px-4 py-2 bg-[#1a1a1c] border-b border-white/5 select-none shrink-0">
                 <div className="flex items-center gap-2 text-white/60">
                     <TerminalIcon size={14} />
-                    <span className="text-xs font-bold">cadet@yadika-server:~/documents</span>
+                    <span className="text-xs font-bold">cadet@ctf:~/documents</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={() => setIsMaximized(!isMaximized)} className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors">
@@ -406,14 +406,14 @@ export default function FileManagementTerminal({ onComplete }: { onComplete?: ()
             {/* Tutorial Pane */}
             <div className={`p-4 bg-[#222] border-b border-white/10 flex flex-col gap-2 shrink-0`}>
                 <div className="flex items-center justify-between">
-                    <h3 className="text-[#E95420] font-bold text-sm uppercase flex items-center gap-2">
-                        <Play size={14} fill="currentColor" />
+                    <h3 className="text-[#E95420] font-bold text-[10px] md:text-sm uppercase flex items-center gap-2">
+                        <Play size={14} fill="currentColor" className="shrink-0" />
                         Step {step + 1}/{tutorials.length}: {tutorials[step].title}
                     </h3>
                     {isStepCompleted && <span className="text-green-500 text-xs font-bold flex items-center gap-1"><CheckCircle2 size={12} /> COMPLETED</span>}
                 </div>
-                <p className="text-sm text-white/80">{tutorials[step].instruction}</p>
-                <div className="bg-black/30 p-2 rounded border-l-2 border-[#E95420] text-xs text-secondary font-mono">
+                <p className="text-[11px] md:text-sm text-white/80">{tutorials[step].instruction}</p>
+                <div className="bg-black/30 p-2 rounded border-l-2 border-[#E95420] text-[10px] md:text-xs text-secondary font-mono">
                     <span className="opacity-50">Task: </span>
                     {tutorials[step].task}
                 </div>
@@ -426,10 +426,10 @@ export default function FileManagementTerminal({ onComplete }: { onComplete?: ()
                 onClick={() => inputRef.current?.focus()}
             >
                 {output.map((line, i) => (
-                    <div key={i} className="text-sm break-all font-mono">
+                    <div key={i} className="text-[10px] md:text-sm break-all font-mono">
                         {line.type === 'command' ? (
                             <div className="flex gap-2 text-white">
-                                <span className="text-green-500 font-bold shrink-0">cadet@yadika-server:</span>
+                                <span className="text-green-500 font-bold shrink-0">cadet@ctf:</span>
                                 <span className="text-blue-400 font-bold shrink-0">{cwd[cwd.length - 1] === 'cadet' ? '~' : `~/${cwd.slice(2).join('/')}`} $</span>
                                 <span>{line.content}</span>
                             </div>
@@ -442,8 +442,8 @@ export default function FileManagementTerminal({ onComplete }: { onComplete?: ()
                 ))}
 
                 {/* Active Input */}
-                <div className="flex gap-2 text-sm text-white font-mono items-center">
-                    <span className="text-green-500 font-bold shrink-0">cadet@yadika-server:</span>
+                <div className="flex gap-2 text-[10px] md:text-sm text-white font-mono items-center">
+                    <span className="text-green-500 font-bold shrink-0">cadet@ctf:</span>
                     <span className="text-blue-400 font-bold shrink-0">{cwd[cwd.length - 1] === 'cadet' ? '~' : `~/${cwd.slice(2).join('/')}`} $</span>
                     <form onSubmit={handleCommand} className="flex-1">
                         <input

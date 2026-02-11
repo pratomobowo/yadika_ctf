@@ -89,14 +89,14 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
         switch (loginState) {
             case 'choice':
                 if (cmd === 'login') {
-                    setLines(prev => [...prev, `guest@yadika:~$ ${value}`, '', 'LOGIN', '']);
+                    setLines(prev => [...prev, `guest@ctf:~$ ${value}`, '', 'LOGIN', '']);
                     setLoginState('login_user');
                 } else if (cmd === 'register') {
-                    setLines(prev => [...prev, `guest@yadika:~$ ${value}`, '', 'REGISTER', '']);
+                    setLines(prev => [...prev, `guest@ctf:~$ ${value}`, '', 'REGISTER', '']);
                     setLoginState('register_name');
                 } else if (cmd === 'help') {
                     setLines(prev => [...prev,
-                    `guest@yadika:~$ ${value}`,
+                    `guest@ctf:~$ ${value}`,
                         'Perintah tersedia:',
                         '  login    - Memulai proses masuk',
                         '  register - Membuat akun baru',
@@ -107,7 +107,7 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
                 } else if (cmd === 'clear') {
                     setLines([]);
                 } else if (cmd) {
-                    setLines(prev => [...prev, `guest@yadika:~$ ${value}`, `bash: ${value}: command not found. Need help? type 'help'`, '']);
+                    setLines(prev => [...prev, `guest@ctf:~$ ${value}`, `bash: ${value}: command not found. Need help? type 'help'`, '']);
                 }
                 break;
 
@@ -164,16 +164,16 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
                 const shellCmd = value.toLowerCase();
 
                 if (shellCmd === 'start') {
-                    setLines(prev => [...prev, `${user?.fullName || 'cadet'}@yadika:~$ ${value}`, '', 'Initializing challenge...', '[████████████████████] 100%', '']);
+                    setLines(prev => [...prev, `${user?.fullName || 'cadet'}@ctf:~$ ${value}`, '', 'Initializing challenge...', '[████████████████████] 100%', '']);
                     setInput('');
                     setTimeout(() => router.push('/play/1'), 1000);
                     return;
                 } else if (shellCmd === 'help') {
-                    setLines(prev => [...prev, `${user?.fullName || 'cadet'}@yadika:~$ ${value}`, '  start  - Mulai CTF challenge', '  help   - Tampilkan bantuan', '  clear  - Bersihkan layar', '']);
+                    setLines(prev => [...prev, `${user?.fullName || 'cadet'}@ctf:~$ ${value}`, '  start  - Mulai CTF challenge', '  help   - Tampilkan bantuan', '  clear  - Bersihkan layar', '']);
                 } else if (shellCmd === 'clear') {
                     setLines([]);
                 } else {
-                    setLines(prev => [...prev, `${user?.fullName || 'cadet'}@yadika:~$ ${value}`, `bash: ${value}: command not found`, '']);
+                    setLines(prev => [...prev, `${user?.fullName || 'cadet'}@ctf:~$ ${value}`, `bash: ${value}: command not found`, '']);
                 }
                 break;
         }
@@ -183,13 +183,13 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
 
     const getPrompt = () => {
         switch (loginState) {
-            case 'choice': return 'guest@yadika:~$ ';
+            case 'choice': return 'guest@ctf:~$ ';
             case 'login_user': return 'Username: ';
             case 'login_pass': return 'Password: ';
             case 'register_name': return 'Nama Lengkap: ';
             case 'register_discord': return 'Username Discord: ';
             case 'register_pass': return 'Password: ';
-            case 'shell': return `${user?.fullName?.toLowerCase().replace(/\s+/g, '_') || 'cadet'}@yadika:~$ `;
+            case 'shell': return `${user?.fullName?.toLowerCase().replace(/\s+/g, '_') || 'cadet'}@ctf:~$ `;
             default: return '';
         }
     };
@@ -204,7 +204,7 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
             <div className="bg-[#1a1a1c] px-4 py-2 border-b border-terminal/20 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-terminal/70">
                     <TerminalIcon size={16} />
-                    <span className="text-xs font-mono">yadika-terminal</span>
+                    <span className="text-xs font-mono">ctf-terminal</span>
                 </div>
                 <div className="flex gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500/50" />
@@ -213,7 +213,7 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
                 </div>
             </div>
 
-            <div ref={scrollRef} className="p-4 h-[400px] overflow-y-auto font-mono text-sm terminal-scrollbar">
+            <div ref={scrollRef} className="p-3 md:p-4 h-[320px] md:h-[400px] overflow-y-auto font-mono text-[10px] sm:text-xs md:text-sm terminal-scrollbar">
                 {loading && (
                     <div className="text-terminal animate-pulse">Loading...</div>
                 )}
@@ -235,7 +235,7 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
 
                 {showInput && (
                     <form onSubmit={handleSubmit} className="flex items-center gap-0 mt-1">
-                        <span className="text-terminal whitespace-nowrap">{getPrompt()}</span>
+                        <span className="text-terminal whitespace-nowrap text-[10px] sm:text-xs md:text-sm">{getPrompt()}</span>
                         <input
                             ref={inputRef}
                             type={loginState.includes('pass') ? 'password' : 'text'}
@@ -244,13 +244,13 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
                             autoFocus
                             autoComplete="off"
                             spellCheck={false}
-                            className="flex-1 bg-transparent border-none outline-none text-terminal caret-terminal focus:ring-0 p-0"
+                            className="flex-1 bg-transparent border-none outline-none text-terminal caret-terminal focus:ring-0 p-0 text-[10px] sm:text-xs md:text-sm"
                         />
                     </form>
                 )}
 
                 {loginState === 'authenticating' && (
-                    <div className="text-terminal animate-pulse">Processing...</div>
+                    <div className="text-terminal animate-pulse text-[10px] sm:text-xs md:text-sm">Processing...</div>
                 )}
             </div>
         </div>
