@@ -47,6 +47,7 @@ const SidebarItem = ({ href, icon: Icon, label, active, locked, completed }: Sid
 };
 
 const ctfLevels = [
+    // Stage 1: Linux Fundamentals (1-10)
     { id: 1, title: 'Welcome to the Shell' },
     { id: 2, title: 'The Hidden Message' },
     { id: 3, title: 'Needle in a Haystack' },
@@ -57,7 +58,52 @@ const ctfLevels = [
     { id: 8, title: 'Environment Secrets' },
     { id: 9, title: 'Web Recon' },
     { id: 10, title: 'Bash Script Runner' },
+    // Stage 2: Intermediate Linux (11-20)
+    { id: 11, title: 'Find the Needle' },
+    { id: 12, title: 'Cron Job Spy' },
+    { id: 13, title: 'Symlink Trail' },
+    { id: 14, title: 'Archive Digger' },
+    { id: 15, title: 'Disk Detective' },
+    { id: 16, title: 'Log Analyzer' },
+    { id: 17, title: 'User Hunter' },
+    { id: 18, title: 'Network Peek' },
+    { id: 19, title: 'Sed Surgeon' },
+    { id: 20, title: 'Awk Wizard' },
+    // Stage 3: Networking & Protocols (21-30)
+    { id: 21, title: 'Ping Sweep' },
+    { id: 22, title: 'Port Scanner' },
+    { id: 23, title: 'DNS Lookup' },
+    { id: 24, title: 'HTTP Inspector' },
+    { id: 25, title: 'Wget Warrior' },
+    { id: 26, title: 'Firewall Rules' },
+    { id: 27, title: 'SSH Key Master' },
+    { id: 28, title: 'SCP Transfer' },
+    { id: 29, title: 'Network Sniffer' },
+    { id: 30, title: 'Reverse Shell 101' },
+    // Stage 4: DevOps Tools (31-40)
+    { id: 31, title: 'Git Basics' },
+    { id: 32, title: 'Git Secrets' },
+    { id: 33, title: 'Docker Hello' },
+    { id: 34, title: 'Docker Inspect' },
+    { id: 35, title: 'Dockerfile Builder' },
+    { id: 36, title: 'Docker Compose' },
+    { id: 37, title: 'Systemd Service' },
+    { id: 38, title: 'Nginx Config' },
+    { id: 39, title: 'Environment Deploy' },
+    { id: 40, title: 'CI/CD Pipeline' },
+    // Stage 5: Security & Advanced (41-50)
+    { id: 41, title: 'Password Crack' },
+    { id: 42, title: 'SSL Inspector' },
+    { id: 43, title: 'Sudo Escalation' },
+    { id: 44, title: 'SUID Exploit' },
+    { id: 45, title: 'Backup Recovery' },
+    { id: 46, title: 'Steganography' },
+    { id: 47, title: 'Log Forensics' },
+    { id: 48, title: 'Docker Escape' },
+    { id: 49, title: 'Incident Response' },
+    { id: 50, title: 'Final Boss' },
 ];
+
 
 
 export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {

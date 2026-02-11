@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { getAllFlags, getLevelById } from '@/lib/ctfLevels';
 
-// Flags for each level
-const FLAGS: { [level: number]: string } = {
-    1: 'yadika{shell_king}',
-    2: 'yadika{b4se64_d3c0d3r}',
-    3: 'yadika{gr3p_m4st3r}',
-    4: 'yadika{p1p3_dr34m3r}',
-    5: 'yadika{ch0wn_th3_w0rld}',
-    6: 'yadika{ps_aux_grep}',
-    7: 'yadika{redir_master_ok}',
-    8: 'yadika{env_var_found}',
-    9: 'yadika{web_root_explorer}',
-    10: 'yadika{bash_script_hero}',
+// CTF Flags from central config
+const CTF_FLAGS = getAllFlags();
+
+// Module Flags (keep existing for now if any, or merge into central config later)
+const MODULE_FLAGS: { [level: number]: string } = {
+    // Modules use 1XXX, 2XXX, etc.
 };
 
 export async function GET() {
@@ -59,10 +54,24 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check if flag is correct
-        // Check if flag is correct
+        let correctFlag = '';
+        let pointsToAward = 10; // Default for modules
+
         if (level < 1000) {
-            const correctFlag = FLAGS[level];
+            // It's a CTF level
+            const levelData = getLevelById(level);
+            correctFlag = levelData?.flag || '';
+            pointsToAward = levelData?.points || 20;
+
+            if (!correctFlag || flag.toLowerCase() !== correctFlag.toLowerCase()) {
+                return NextResponse.json(
+                    { error: 'Flag salah!', correct: false },
+                    { status: 400 }
+                );
+            }
+        } else {
+            // It's a Module level
+            correctFlag = MODULE_FLAGS[level] || '';
             if (!correctFlag || flag.toLowerCase() !== correctFlag.toLowerCase()) {
                 return NextResponse.json(
                     { error: 'Flag salah!', correct: false },
@@ -91,8 +100,6 @@ export async function POST(request: NextRequest) {
         }
 
         // Save progress
-        const pointsToAward = level >= 1000 ? 10 : 20; // Module = 10pts, CTF = 20pts
-
         await prisma.progress.create({
             data: {
                 userId: session.id,
