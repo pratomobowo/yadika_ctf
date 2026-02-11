@@ -64,10 +64,6 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
 
             await new Promise(r => setTimeout(r, 200));
             setLines(prev => [...prev,
-                '╔═══════════════════════════════════════════╗',
-                '║      🏴 YADIKA CTF TRAINING PLATFORM 🏴     ║',
-                '╚═══════════════════════════════════════════╝',
-                '',
                 'System ready. Type a command to proceed.',
                 ''
             ]);
