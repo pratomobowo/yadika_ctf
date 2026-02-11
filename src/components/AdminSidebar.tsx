@@ -13,7 +13,7 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     const pathname = usePathname();
 
     const menuItems = [
-        { href: '/admin/users', icon: Users, label: 'MANAGE USERS' },
+        { href: '/admin', icon: Users, label: 'MANAGE USERS' },
         { href: '/admin/challenges', icon: Database, label: 'CHALLENGES (Coming Soon)', disabled: true },
         { href: '/admin/settings', icon: Settings, label: 'PLATFORM SETTINGS', disabled: true },
     ];
@@ -62,10 +62,10 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                                 href={item.disabled ? '#' : item.href}
                                 onClick={item.disabled ? (e) => e.preventDefault() : undefined}
                                 className={`flex items-center gap-3 p-2.5 rounded-md transition-all font-mono text-[11px] ${active
-                                        ? 'bg-[#E95420]/10 text-[#E95420] border border-[#E95420]/20'
-                                        : item.disabled
-                                            ? 'text-foreground/20 cursor-not-allowed'
-                                            : 'text-foreground/60 hover:bg-white/5 hover:text-white'
+                                    ? 'bg-[#E95420]/10 text-[#E95420] border border-[#E95420]/20'
+                                    : item.disabled
+                                        ? 'text-foreground/20 cursor-not-allowed'
+                                        : 'text-foreground/60 hover:bg-white/5 hover:text-white'
                                     }`}
                             >
                                 <item.icon size={16} />

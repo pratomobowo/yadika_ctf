@@ -120,7 +120,7 @@ export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
                         </Link>
 
                         {user?.role === 'ADMIN' && (
-                            <Link href="/admin/users"
+                            <Link href="/admin"
                                 className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[#E95420]/10 border border-[#E95420]/20 text-[#E95420] hover:bg-[#E95420]/20 transition-all group"
                             >
                                 <Shield size={16} />
