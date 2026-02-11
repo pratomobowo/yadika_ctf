@@ -12,6 +12,7 @@ model User {
   fullName  String
   discord   String     @unique
   password  String
+  points    Int        @default(0)
   createdAt DateTime   @default(now())
   progress  Progress[]
 }

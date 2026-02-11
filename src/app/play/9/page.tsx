@@ -1,6 +1,6 @@
 "use client";
 
-import { Level2Terminal } from '@/components/Level2Terminal';
+import { Level9Terminal } from '@/components/Level9Terminal';
 import { SessionLayout } from '@/components/layouts/SessionLayout';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -9,17 +9,17 @@ import { useSubmitFlag } from '@/hooks/useSubmitFlag';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
-export default function Level2() {
+export default function Level9() {
     const [flag, setFlag] = useState('');
     const [flagFound, setFlagFound] = useState(false);
-    const { submitFlag, status, alreadyCompleted, setStatus } = useSubmitFlag(2, 'yadika{b4se64_d3c0d3r}');
+    const { submitFlag, status, alreadyCompleted, setStatus } = useSubmitFlag(9, 'yadika{web_root_explorer}');
     const { user, loading, isLevelUnlocked } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
         if (!loading) {
             if (!user) router.push('/');
-            else if (!isLevelUnlocked(2)) router.push('/play/1');
+            else if (!isLevelUnlocked(9)) router.push('/play/8');
         }
     }, [user, loading, router, isLevelUnlocked]);
 
@@ -42,11 +42,11 @@ export default function Level2() {
     }
 
     return (
-        <SessionLayout title="Level 2: The Hidden Message" currentLevel={2} showObjectives={false}>
+        <SessionLayout title="Level 9: Web Recon" currentLevel={9} showObjectives={false}>
             <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
                     <p className="text-xs text-foreground/50 font-mono">
-                        Temukan dan decode pesan Base64 yang tersembunyi. Format: <code className="text-secondary">yadika{'{...}'}</code>
+                        Periksa folder default web server dan temukan flag rahasia. Format: <code className="text-primary">yadika{'{...}'}</code>
                     </p>
                     <div className="flex items-center gap-2">
                         {alreadyCompleted && (
@@ -59,7 +59,7 @@ export default function Level2() {
                 </div>
 
                 <div className="flex-1 p-4 overflow-hidden">
-                    <Level2Terminal onFlagFound={handleFlagFound} />
+                    <Level9Terminal onFlagFound={handleFlagFound} />
                 </div>
 
                 <div className="px-4 py-3 border-t border-white/5">
@@ -76,12 +76,12 @@ export default function Level2() {
                             value={flag}
                             onChange={(e) => setFlag(e.target.value)}
                             disabled={status === 'correct'}
-                            className="flex-1 bg-black/50 border border-white/10 rounded px-3 py-2 font-mono text-sm text-secondary focus:border-secondary outline-none disabled:opacity-50"
+                            className="flex-1 bg-black/50 border border-white/10 rounded px-3 py-2 font-mono text-sm text-terminal focus:border-primary outline-none disabled:opacity-50"
                         />
                         <button
                             type="submit"
                             disabled={status === 'correct' || status === 'submitting'}
-                            className={`px-4 py-2 rounded font-bold text-sm flex items-center gap-1.5 transition-all ${status === 'correct' ? 'bg-green-500 text-black' : 'bg-secondary text-black hover:bg-secondary/80'
+                            className={`px-4 py-2 rounded font-bold text-sm flex items-center gap-1.5 transition-all ${status === 'correct' ? 'bg-green-500 text-black' : 'bg-primary text-black hover:bg-primary/80'
                                 }`}
                         >
                             {status === 'correct' ? (

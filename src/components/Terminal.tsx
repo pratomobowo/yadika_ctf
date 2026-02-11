@@ -123,8 +123,8 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
 
                 const loginResult = await login(formData.discord, value);
                 if (loginResult.success) {
-                    setLines(prev => [...prev, '', '✓ Login berhasil!', '', 'Ketik "start" untuk memulai challenge.', '']);
-                    setLoginState('shell');
+                    setLines(prev => [...prev, '', '✓ Login berhasil!', '', 'Redirecting...']);
+                    window.location.href = '/dashboard';
                 } else {
                     setLines(prev => [...prev, '', `✗ Error: ${loginResult.error}`, '', 'Coba lagi:', '']);
                     setFormData({ fullName: '', discord: '', password: '' });
@@ -150,8 +150,8 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
 
                 const registerResult = await register(formData.fullName, formData.discord, value);
                 if (registerResult.success) {
-                    setLines(prev => [...prev, '', '✓ Registrasi berhasil!', '', 'Ketik "start" untuk memulai challenge.', '']);
-                    setLoginState('shell');
+                    setLines(prev => [...prev, '', '✓ Registrasi berhasil!', '', 'Redirecting...']);
+                    window.location.href = '/dashboard';
                 } else {
                     setLines(prev => [...prev, '', `✗ Error: ${registerResult.error}`, '', 'Coba lagi:', '']);
                     setFormData({ fullName: '', discord: '', password: '' });

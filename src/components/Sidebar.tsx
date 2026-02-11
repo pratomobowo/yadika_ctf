@@ -1,27 +1,78 @@
-"use client";
-
 import Link from 'next/link';
-import { CheckCircle2, Circle, LogOut, User, Lock } from 'lucide-react';
+import { CheckCircle2, Circle, LogOut, User, Lock, BookOpen, ChevronRight, ChevronDown, Shield, Terminal, FolderOpen, LucideIcon, Target } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const levels = [
+interface SidebarItemProps {
+    href: string;
+    icon: LucideIcon;
+    label: string;
+    active: boolean;
+    locked: boolean;
+    completed: boolean;
+}
+
+const SidebarItem = ({ href, icon: Icon, label, active, locked, completed }: SidebarItemProps) => {
+    return (
+        <Link
+            href={locked ? '#' : href}
+            className={`flex items-center gap-2 p-2 rounded-md transition-colors ${active
+                ? 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(0,183,255,0.1)]'
+                : completed
+                    ? 'text-green-400/70 hover:bg-white/5'
+                    : locked
+                        ? 'text-foreground/20 cursor-not-allowed grayscale'
+                        : 'text-foreground/60 hover:bg-white/5 hover:text-foreground'
+                }`}
+        >
+            {completed ? (
+                <CheckCircle2 size={12} className="text-green-500 shrink-0" />
+            ) : locked ? (
+                <Lock size={12} className="text-foreground/20 shrink-0" />
+            ) : (
+                <Icon size={12} className="shrink-0" />
+            )}
+            <span className="text-[11px] font-mono truncate">
+                {label}
+            </span>
+        </Link>
+    );
+};
+
+const ctfLevels = [
     { id: 1, title: 'Welcome to the Shell' },
     { id: 2, title: 'The Hidden Message' },
     { id: 3, title: 'Needle in a Haystack' },
     { id: 4, title: 'Pipelining' },
     { id: 5, title: 'Strict Rules' },
+    { id: 6, title: 'Process Hunting' },
+    { id: 7, title: 'Output Master' },
+    { id: 8, title: 'Environment Secrets' },
+    { id: 9, title: 'Web Recon' },
+    { id: 10, title: 'Bash Script Runner' },
 ];
+
 
 export function Sidebar({ currentLevel }: { currentLevel: number }) {
     const { user, isLevelCompleted, isLevelUnlocked, logout } = useAuth();
+    const [isSessionsOpen, setIsSessionsOpen] = useState(true);
+    const [isCTFOpen, setIsCTFOpen] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => { setMounted(true); }, []);
 
     const handleLogout = async () => {
         await logout();
         window.location.href = '/';
     };
 
+    if (!mounted) {
+        return <div className="w-72 bg-[#111113] border-r border-terminal/10 p-4 hidden md:flex flex-col gap-4 overflow-y-auto" />;
+    }
+
     return (
-        <div className="w-64 bg-[#111113] border-r border-terminal/10 p-4 hidden md:flex flex-col gap-6">
+        <div className="w-72 bg-[#111113] border-r border-terminal/10 p-4 hidden md:flex flex-col gap-4 overflow-y-auto">
             <div className="flex items-center gap-3 px-2 py-4 border-b border-terminal/10 mb-2">
                 <div className="w-10 h-10 rounded-full bg-terminal/10 flex items-center justify-center text-terminal border border-terminal/20">
                     <User size={20} />
@@ -32,55 +83,165 @@ export function Sidebar({ currentLevel }: { currentLevel: number }) {
                 </div>
             </div>
 
-            <nav className="flex flex-col gap-2">
-                {levels.map((lvl) => {
-                    const completed = isLevelCompleted(lvl.id);
-                    const unlocked = isLevelUnlocked(lvl.id);
+            <nav className="flex flex-col gap-4">
+                {/* Dashboard Link */}
+                <Link href="/dashboard"
+                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-all group"
+                >
+                    <Target size={16} />
+                    <span className="text-xs font-bold font-mono tracking-wider uppercase">Dashboard</span>
+                </Link>
 
-                    const isCurrent = lvl.id === currentLevel;
+                {/* Materi Industri Section */}
+                <div className="flex flex-col gap-1">
+                    <button
+                        onClick={() => setIsSessionsOpen(!isSessionsOpen)}
+                        className="flex items-center justify-between gap-2 px-2 py-2 text-foreground/40 hover:text-primary transition-colors hover:bg-white/5 rounded-md group"
+                    >
+                        <div className="flex items-center gap-2">
+                            <BookOpen size={16} />
+                            <span className="text-xs font-bold font-mono tracking-widest uppercase">Materi Industri</span>
+                        </div>
+                        {isSessionsOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    </button>
 
-                    const itemContent = (
-                        <>
-                            {completed ? (
-                                <CheckCircle2 size={16} className="text-green-500 shrink-0" />
-                            ) : unlocked ? (
-                                <Circle size={16} className="shrink-0" />
-                            ) : (
-                                <Lock size={16} className="text-foreground/20 shrink-0" />
-                            )}
-                            <span className="text-sm font-mono truncate">
-                                Lvl {lvl.id}: {lvl.title}
-                            </span>
-                        </>
-                    );
-
-                    if (!unlocked && !isCurrent) {
-                        return (
-                            <div
-                                key={lvl.id}
-                                className="flex items-center gap-3 p-2 rounded-md text-foreground/20 cursor-not-allowed grayscale"
-                                title="Selesaikan level sebelumnya untuk membuka"
+                    <AnimatePresence>
+                        {isSessionsOpen && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="flex flex-col gap-1 pl-4 overflow-hidden"
                             >
-                                {itemContent}
-                            </div>
-                        );
-                    }
+                                {/* Explicitly listing implemented modules */}
+                                <SidebarItem
+                                    href="/play/session/1"
+                                    icon={Terminal}
+                                    label="1. Install Ubuntu"
+                                    active={typeof window !== 'undefined' && window.location.pathname === '/play/session/1'}
+                                    locked={!isLevelUnlocked(1001)}
+                                    completed={isLevelCompleted(1001)}
+                                />
+                                <SidebarItem
+                                    href="/play/session/2"
+                                    icon={Terminal}
+                                    label="2. Basic Commands"
+                                    active={typeof window !== 'undefined' && window.location.pathname === '/play/session/2'}
+                                    locked={!isLevelUnlocked(1002)}
+                                    completed={isLevelCompleted(1002)}
+                                />
+                                <SidebarItem
+                                    href="/play/session/3"
+                                    icon={FolderOpen}
+                                    label="3. File Management"
+                                    active={typeof window !== 'undefined' && window.location.pathname === '/play/session/3'}
+                                    locked={!isLevelUnlocked(1003)}
+                                    completed={isLevelCompleted(1003)}
+                                />
 
-                    return (
-                        <Link
-                            key={lvl.id}
-                            href={`/play/${lvl.id}`}
-                            className={`flex items-center gap-3 p-2 rounded-md transition-colors ${isCurrent
-                                ? 'bg-terminal/10 text-terminal border border-terminal/20 shadow-[0_0_15px_rgba(0,255,159,0.1)]'
-                                : completed
-                                    ? 'text-green-400/70 hover:bg-white/5'
-                                    : 'text-foreground/60 hover:bg-white/5 hover:text-foreground'
-                                }`}
-                        >
-                            {itemContent}
-                        </Link>
-                    );
-                })}
+                                {/* Future modules mapped from data */}
+                                {[
+                                    { id: 1004, title: '4. Text Editing & Manipulation', path: '/play/session/4' },
+                                    { id: 1005, title: '5. User & Permission Mgmt', path: '/play/session/5' },
+                                ].map((item) => {
+                                    const completed = isLevelCompleted(item.id);
+                                    const unlocked = isLevelUnlocked(item.id); // Simple unlock check
+                                    const isCurrent = typeof window !== 'undefined' && window.location.pathname === item.path;
+
+                                    return (
+                                        <SidebarItem
+                                            key={item.id}
+                                            href={unlocked ? item.path : '#'}
+                                            icon={Terminal} // Default icon
+                                            label={item.title}
+                                            active={isCurrent}
+                                            locked={!unlocked}
+                                            completed={completed}
+                                        />
+                                    );
+                                })}
+                                {/* Placeholder for future materials */}
+                                <div className="text-[11px] font-mono text-foreground/10 p-2 flex items-center gap-2 ml-2">
+                                    <Circle size={12} className="opacity-20" />
+                                    <span>More coming soon...</span>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+
+                {/* Special CTF Section */}
+                <div className="flex flex-col gap-1">
+                    <button
+                        onClick={() => setIsCTFOpen(!isCTFOpen)}
+                        className="flex items-center justify-between gap-2 px-2 py-2 text-foreground/40 hover:text-secondary transition-colors hover:bg-white/5 rounded-md group"
+                    >
+                        <div className="flex items-center gap-2">
+                            <Shield size={16} />
+                            <span className="text-xs font-bold font-mono tracking-widest uppercase">Special CTF</span>
+                        </div>
+                        {isCTFOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    </button>
+
+                    <AnimatePresence>
+                        {isCTFOpen && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                className="flex flex-col gap-1 pl-4 overflow-hidden"
+                            >
+                                {ctfLevels.map((lvl) => {
+                                    const completed = isLevelCompleted(lvl.id);
+                                    const unlocked = isLevelUnlocked(lvl.id);
+                                    const isCurrent = lvl.id === currentLevel;
+
+                                    const itemContent = (
+                                        <>
+                                            {completed ? (
+                                                <CheckCircle2 size={14} className="text-green-500 shrink-0" />
+                                            ) : unlocked ? (
+                                                <Circle size={14} className="shrink-0" />
+                                            ) : (
+                                                <Lock size={14} className="text-foreground/20 shrink-0" />
+                                            )}
+                                            <span className="text-[12px] font-mono truncate">
+                                                Lvl {lvl.id}: {lvl.title}
+                                            </span>
+                                        </>
+                                    );
+
+                                    if (!unlocked && !isCurrent) {
+                                        return (
+                                            <div
+                                                key={lvl.id}
+                                                className="flex items-center gap-2 p-2 rounded-md text-foreground/20 cursor-not-allowed grayscale"
+                                                title="Selesaikan level sebelumnya untuk membuka"
+                                            >
+                                                {itemContent}
+                                            </div>
+                                        );
+                                    }
+
+                                    return (
+                                        <Link
+                                            key={lvl.id}
+                                            href={`/play/${lvl.id}`}
+                                            className={`flex items-center gap-2 p-2 rounded-md transition-colors ${isCurrent
+                                                ? 'bg-terminal/10 text-terminal border border-terminal/20 shadow-[0_0_15px_rgba(0,255,159,0.1)]'
+                                                : completed
+                                                    ? 'text-green-400/70 hover:bg-white/5'
+                                                    : 'text-foreground/60 hover:bg-white/5 hover:text-foreground'
+                                                }`}
+                                        >
+                                            {itemContent}
+                                        </Link>
+                                    );
+                                })}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
             </nav>
 
             <div className="mt-auto pt-4 border-t border-terminal/10 space-y-1">

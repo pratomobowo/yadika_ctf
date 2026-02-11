@@ -55,12 +55,15 @@ export async function POST(request: NextRequest) {
         }
 
         // Check if flag is correct
-        const correctFlag = FLAGS[level];
-        if (!correctFlag || flag.toLowerCase() !== correctFlag.toLowerCase()) {
-            return NextResponse.json(
-                { error: 'Flag salah!', correct: false },
-                { status: 400 }
-            );
+        // Check if flag is correct
+        if (level < 1000) {
+            const correctFlag = FLAGS[level];
+            if (!correctFlag || flag.toLowerCase() !== correctFlag.toLowerCase()) {
+                return NextResponse.json(
+                    { error: 'Flag salah!', correct: false },
+                    { status: 400 }
+                );
+            }
         }
 
         // Check if already completed
@@ -83,6 +86,8 @@ export async function POST(request: NextRequest) {
         }
 
         // Save progress
+        const pointsToAward = level >= 1000 ? 10 : 20; // Module = 10pts, CTF = 20pts
+
         await prisma.progress.create({
             data: {
                 userId: session.id,
@@ -91,10 +96,16 @@ export async function POST(request: NextRequest) {
             },
         });
 
+        await prisma.user.update({
+            where: { id: session.id },
+            data: { points: { increment: pointsToAward } },
+        });
+
         return NextResponse.json({
             success: true,
             correct: true,
             message: 'Selamat! Flag benar!',
+            pointsAwarded: pointsToAward,
         });
     } catch (error) {
         console.error('Submit progress error:', error);

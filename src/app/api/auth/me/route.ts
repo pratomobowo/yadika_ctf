@@ -17,6 +17,7 @@ export async function GET() {
                 id: true,
                 fullName: true,
                 discord: true,
+                points: true,
                 createdAt: true,
                 progress: {
                     select: {

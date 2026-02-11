@@ -1,9 +1,21 @@
 "use client";
 
+import { useEffect } from 'react';
 import { Terminal } from '@/components/Terminal';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 export default function Home() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, loading, router]);
+
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#0a0a0c] text-foreground overflow-hidden relative">
       {/* Background Decor */}

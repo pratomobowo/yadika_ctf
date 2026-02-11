@@ -1,38 +1,30 @@
 "use client";
 
-import { Sidebar } from '@/components/Sidebar';
 import { Level3Terminal } from '@/components/Level3Terminal';
+import { SessionLayout } from '@/components/layouts/SessionLayout';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Send, CheckCircle2, Lightbulb, FileText, Shield, FileCode, Lock } from 'lucide-react';
+import { Send, CheckCircle2, Lock } from 'lucide-react';
 import { useSubmitFlag } from '@/hooks/useSubmitFlag';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function Level3() {
     const [flag, setFlag] = useState('');
-    const [showHint, setShowHint] = useState(false);
     const [flagFound, setFlagFound] = useState(false);
     const { submitFlag, status, alreadyCompleted, setStatus } = useSubmitFlag(3, 'yadika{gr3p_m4st3r}');
     const { user, loading, isLevelUnlocked } = useAuth();
     const router = useRouter();
 
-    // Redirect to home if not logged in
     useEffect(() => {
         if (!loading) {
-            if (!user) {
-                router.push('/');
-            } else if (!isLevelUnlocked(3)) {
-                router.push('/play/2');
-            }
+            if (!user) router.push('/');
+            else if (!isLevelUnlocked(3)) router.push('/play/2');
         }
     }, [user, loading, router, isLevelUnlocked]);
 
-    // If already completed, show correct status
     useEffect(() => {
-        if (alreadyCompleted) {
-            setStatus('correct');
-        }
+        if (alreadyCompleted) setStatus('correct');
     }, [alreadyCompleted, setStatus]);
 
     const handleFlagFound = (foundFlag: string) => {
@@ -50,182 +42,62 @@ export default function Level3() {
     }
 
     return (
-        <div className="min-h-screen flex bg-[#0a0a0c]">
-            <Sidebar currentLevel={3} />
-
-            <main className="flex-1 p-4 md:p-8 lg:p-12 overflow-y-auto">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="max-w-5xl mx-auto"
-                >
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="p-3 bg-accent/10 rounded-lg text-accent">
-                            <Search size={24} />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-bold text-accent">Level 3: Needle in a Haystack</h1>
-                            <p className="text-foreground/60 font-mono text-sm">Target: Searching with grep</p>
-                        </div>
+        <SessionLayout title="Level 3: Needle in a Haystack" currentLevel={3} showObjectives={false}>
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between">
+                    <p className="text-xs text-foreground/50 font-mono">
+                        Cari FLAG di antara banyak file log. Format: <code className="text-accent">yadika{'{...}'}</code>
+                    </p>
+                    <div className="flex items-center gap-2">
                         {alreadyCompleted && (
-                            <div className="ml-auto flex items-center gap-2 text-green-400 bg-green-500/10 px-3 py-1 rounded-full text-sm">
-                                <CheckCircle2 size={16} />
-                                Completed
-                            </div>
+                            <span className="flex items-center gap-1 text-green-400 bg-green-500/10 px-2 py-1 rounded text-xs">
+                                <CheckCircle2 size={12} /> Solved
+                            </span>
                         )}
+                        <span className="text-xs text-amber-400/60 font-mono">+20 pts</span>
                     </div>
+                </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left Column: Mission & Instructions */}
-                        <div className="space-y-4">
-                            <div className="bg-[#111113] p-5 border border-accent/10 rounded-xl space-y-3">
-                                <h2 className="text-primary font-bold flex items-center gap-2">
-                                    <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-                                    MISSION BRIEFING
-                                </h2>
-                                <p className="text-foreground/80 text-sm leading-relaxed">
-                                    Cadet, ada <span className="text-accent font-bold">20 file log</span> di folder <code className="text-accent">/var/log</code>.
-                                    Salah satu file mengandung FLAG rahasia!
-                                </p>
-                                <p className="text-foreground/80 text-sm leading-relaxed">
-                                    Membaca satu per satu? <span className="text-accent">Terlalu lama!</span>
-                                    Gunakan <span className="text-primary font-bold">grep</span> untuk mencari dengan efisien.
-                                </p>
-                            </div>
+                <div className="flex-1 p-4 overflow-hidden">
+                    <Level3Terminal onFlagFound={handleFlagFound} />
+                </div>
 
-                            <div className="bg-[#111113] p-5 border border-accent/10 rounded-xl space-y-3">
-                                <h2 className="text-primary font-bold uppercase text-sm flex items-center gap-2">
-                                    <FileText size={16} />
-                                    Tentang grep
-                                </h2>
-                                <p className="text-foreground/70 text-sm leading-relaxed">
-                                    <code className="text-accent">grep</code> adalah tool untuk mencari teks di dalam file.
-                                    Sangat powerful untuk menemukan informasi di banyak file sekaligus!
-                                </p>
-                                <div className="bg-black/30 p-3 rounded-lg font-mono text-xs space-y-1">
-                                    <p className="text-foreground/50"># Cari di satu file:</p>
-                                    <p className="text-accent">grep "FLAG" file.log</p>
-                                    <p className="text-foreground/50 mt-2"># Cari di semua file .log:</p>
-                                    <p className="text-accent">grep "FLAG" *.log</p>
-                                </div>
-                            </div>
-
-                            <div className="bg-[#111113] p-5 border border-accent/10 rounded-xl space-y-3">
-                                <h2 className="text-primary font-bold uppercase text-sm flex items-center gap-2">
-                                    <FileCode size={16} />
-                                    Perintah Baru
-                                </h2>
-                                <ul className="space-y-2 text-sm text-foreground/70 font-mono">
-                                    <li><code className="text-accent">grep &lt;pola&gt; &lt;file&gt;</code> — cari teks</li>
-                                    <li><code className="text-accent">wc -l &lt;file&gt;</code> — hitung jumlah baris</li>
-                                    <li><code className="text-accent">head &lt;file&gt;</code> — tampilkan 5 baris pertama</li>
-                                </ul>
-                            </div>
-
-                            <button
-                                onClick={() => setShowHint(!showHint)}
-                                className="w-full flex items-center justify-center gap-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-sm hover:bg-yellow-500/20 transition-colors"
-                            >
-                                <Lightbulb size={16} />
-                                {showHint ? 'Sembunyikan Hint' : 'Butuh Petunjuk?'}
-                            </button>
-
-                            {showHint && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: 'auto' }}
-                                    className="bg-yellow-500/5 border border-yellow-500/20 rounded-lg p-4 text-sm text-yellow-200/80 space-y-2"
-                                >
-                                    <p className="flex items-start gap-2">
-                                        <Lightbulb size={16} className="text-yellow-400 shrink-0 mt-0.5" />
-                                        <span> Pergi ke <code className="text-yellow-400">/var/log</code></span>
-                                    </p>
-                                    <p className="flex items-start gap-2">
-                                        <Lightbulb size={16} className="text-yellow-400 shrink-0 mt-0.5" />
-                                        <span> Gunakan <code className="text-yellow-400">grep "FLAG" *.log</code></span>
-                                    </p>
-                                    <p className="flex items-start gap-2">
-                                        <Lightbulb size={16} className="text-yellow-400 shrink-0 mt-0.5" />
-                                        <span> Atau coba cari kata "yadika" atau "SECRET"</span>
-                                    </p>
-                                </motion.div>
+                <div className="px-4 py-3 border-t border-white/5">
+                    {flagFound && !alreadyCompleted && (
+                        <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                            className="text-green-400 text-xs font-mono mb-2 flex items-center gap-1">
+                            <CheckCircle2 size={12} /> Flag terdeteksi!
+                        </motion.p>
+                    )}
+                    <form onSubmit={handleSubmit} className="flex gap-2">
+                        <input
+                            type="text"
+                            placeholder="yadika{...}"
+                            value={flag}
+                            onChange={(e) => setFlag(e.target.value)}
+                            disabled={status === 'correct'}
+                            className="flex-1 bg-black/50 border border-white/10 rounded px-3 py-2 font-mono text-sm text-accent focus:border-accent outline-none disabled:opacity-50"
+                        />
+                        <button
+                            type="submit"
+                            disabled={status === 'correct' || status === 'submitting'}
+                            className={`px-4 py-2 rounded font-bold text-sm flex items-center gap-1.5 transition-all ${status === 'correct' ? 'bg-green-500 text-black' : 'bg-accent text-white hover:bg-accent/80'
+                                }`}
+                        >
+                            {status === 'correct' ? (
+                                <>SOLVED <CheckCircle2 size={14} /></>
+                            ) : status === 'submitting' ? 'CHECKING...' : (
+                                <>SUBMIT <Send size={14} /></>
                             )}
-                        </div>
-
-                        {/* Right Column: Terminal */}
-                        <div className="space-y-4">
-                            <Level3Terminal onFlagFound={handleFlagFound} />
-
-                            {flagFound && !alreadyCompleted && (
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="flex items-center gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-sm"
-                                >
-                                    <CheckCircle2 size={18} />
-                                    Flag terdeteksi! Submit di bawah untuk menyelesaikan level.
-                                </motion.div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Flag Submission */}
-                    <div className="mt-8 bg-[#1a1a1c] p-6 border-2 border-accent/20 rounded-2xl shadow-[0_0_50px_rgba(255,0,85,0.05)]">
-                        <h3 className="text-lg font-bold mb-4 text-center flex items-center justify-center gap-2">
-                            <Shield size={20} className="text-accent" />
-                            SUBMIT YOUR FLAG
-                        </h3>
-                        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
-                            <input
-                                type="text"
-                                placeholder="yadika{...}"
-                                value={flag}
-                                onChange={(e) => setFlag(e.target.value)}
-                                disabled={status === 'correct'}
-                                className="flex-1 bg-black border border-accent/30 rounded-lg px-4 py-3 font-mono text-accent focus:border-accent focus:ring-1 focus:ring-accent outline-none disabled:opacity-50"
-                            />
-                            <button
-                                type="submit"
-                                disabled={status === 'correct' || status === 'submitting'}
-                                className={`px-8 py-3 rounded-lg font-bold flex items-center justify-center gap-2 transition-all ${status === 'correct'
-                                    ? 'bg-green-500 text-black'
-                                    : 'bg-accent text-white hover:bg-accent/80 hover:scale-105 active:scale-95'
-                                    }`}
-                            >
-                                {status === 'correct' ? (
-                                    <>SOLVED <CheckCircle2 size={18} /></>
-                                ) : status === 'submitting' ? (
-                                    'CHECKING...'
-                                ) : (
-                                    'SUBMIT'
-                                )}
-                                {status !== 'correct' && status !== 'submitting' && <Send size={18} />}
-                            </button>
-                        </form>
-
-                        <p className="text-accent mt-4 text-center text-sm animate-pulse flex items-center justify-center gap-2">
-                            <Lock size={16} />
-                            Flag salah! Coba lagi, Cadet.
+                        </button>
+                    </form>
+                    {status === 'wrong' && (
+                        <p className="text-accent text-xs mt-1.5 flex items-center gap-1 font-mono">
+                            <Lock size={12} /> Flag salah, coba lagi.
                         </p>
-                        {status === 'correct' && !alreadyCompleted && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="mt-4 text-center"
-                            >
-                                <p className="text-accent text-lg font-bold mb-2 flex items-center justify-center gap-2">
-                                    <CheckCircle2 size={24} />
-                                    Amazing! Kamu sudah menguasai grep!
-                                </p>
-                                <p className="text-foreground/60 text-sm">
-                                    grep sangat powerful untuk mencari di banyak file. Ready for Level 4?
-                                </p>
-                            </motion.div>
-                        )}
-                    </div>
-                </motion.div>
-            </main>
-        </div>
+                    )}
+                </div>
+            </div>
+        </SessionLayout>
     );
 }
-
