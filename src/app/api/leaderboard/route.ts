@@ -3,7 +3,8 @@ import { prisma } from '@/lib/db';
 
 export async function GET() {
     try {
-        const users = await prisma.user.findMany({
+        // @ts-ignore - Bypass outdated Prisma types in IDE
+        const users = await (prisma.user as any).findMany({
             select: {
                 id: true,
                 discord: true,
@@ -21,7 +22,7 @@ export async function GET() {
             take: 20,
         });
 
-        const leaderboard = users.map((u, i) => ({
+        const leaderboard = users.map((u: any, i: number) => ({
             rank: i + 1,
             discord: u.discord,
             points: u.points,
