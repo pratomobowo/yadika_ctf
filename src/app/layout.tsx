@@ -3,13 +3,13 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
-  title: "Yadika DevOps Learning Center",
-  description: "Platform pembelajaran Linux & DevOps interaktif untuk siswa RPL SMK Yadika. Elevate your shell skills, master the system.",
-  keywords: ["DevOps", "Linux", "CTF", "SMK Yadika", "Terminal Simulator", "Shell skills"],
+  title: "SMK Yadika Soreang - DevOps Learning Center",
+  description: "Platform pembelajaran Linux & DevOps interaktif untuk siswa RPL SMK Yadika Soreang. Elevate your shell skills, master the system.",
+  keywords: ["DevOps", "Linux", "CTF", "SMK Yadika Soreang", "Terminal Simulator", "Shell skills"],
   authors: [{ name: "NextSkill Indonesia" }],
   openGraph: {
-    title: "Yadika DevOps Learning Center",
-    description: "Platform pembelajaran Linux & DevOps interaktif untuk siswa RPL SMK Yadika.",
+    title: "SMK Yadika Soreang - DevOps Learning Center",
+    description: "Platform pembelajaran Linux & DevOps interaktif untuk siswa RPL SMK Yadika Soreang.",
     url: "https://ctf.yadika.id",
     siteName: "Yadika DevOps",
     images: [

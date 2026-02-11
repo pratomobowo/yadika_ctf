@@ -33,7 +33,7 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
     useEffect(() => {
         if (!loading && user) {
             setLines([
-                'Yadika OS 1.0.0 LTS',
+                'Yadika OS (Soreang) v1.1.0 LTS',
                 '',
                 `Selamat datang kembali, ${user.fullName}!`,
                 '',
@@ -52,7 +52,7 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
 
         const bootSequence = async () => {
             const bootMessages = [
-                'Yadika OS 1.0.0 LTS (GNU/Linux 5.15.0-yadika)',
+                'Yadika OS (Soreang) v1.1.0 LTS (GNU/Linux 5.15.0)',
                 '',
                 'Starting system services...',
                 '[  OK  ] Started Network Manager.',

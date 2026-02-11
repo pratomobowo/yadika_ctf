@@ -17,7 +17,7 @@ interface SessionLayoutProps {
 export function SessionLayout({
     children,
     title,
-    subtitle = "Yadika Industry Class",
+    subtitle = "SMK Yadika Soreang - Industry Class",
     currentLevel,
     objectives = [],
     showObjectives = true
