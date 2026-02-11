@@ -16,11 +16,12 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
     const [lines, setLines] = useState<string[]>(initialLines);
     const [input, setInput] = useState('');
     const [loginState, setLoginState] = useState<LoginState>('boot');
-    const [formData, setFormData] = useState({ fullName: '', discord: '', password: '' });
     const scrollRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const router = useRouter();
     const { user, login, register, loading } = useAuth();
+    const [formData, setFormData] = useState({ fullName: '', discord: '', password: '' });
+    const hasBooted = useRef(false);
 
     useEffect(() => {
         if (scrollRef.current) {
@@ -40,12 +41,14 @@ export const Terminal: React.FC<TerminalProps> = ({ initialLines = [] }) => {
                 ''
             ]);
             setLoginState('shell');
+            hasBooted.current = true;
         }
     }, [user, loading]);
 
     // Boot sequence
     useEffect(() => {
-        if (loading || user) return;
+        if (loading || user || hasBooted.current) return;
+        hasBooted.current = true;
 
         const bootSequence = async () => {
             const bootMessages = [
