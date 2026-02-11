@@ -117,6 +117,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [user]);
 
     const isLevelUnlocked = useCallback((level: number) => {
+        // Admins have everything unlocked
+        if (user?.role === 'ADMIN') return true;
+
         // Special CTF Levels (1-5)
         if (level === 1) return isLevelCompleted(1005);
         if (level < 1000) return isLevelCompleted(level - 1);
@@ -124,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Session Levels (1000+)
         if (level === 1001) return true; // Sesi 1 unlocked
         return isLevelCompleted(level - 1);
-    }, [isLevelCompleted]);
+    }, [user, isLevelCompleted]);
 
     return (
         <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser, isLevelCompleted, isLevelUnlocked, updateProgress }}>
