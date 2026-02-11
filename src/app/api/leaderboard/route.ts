@@ -6,7 +6,6 @@ export async function GET() {
         const users = await prisma.user.findMany({
             select: {
                 id: true,
-                fullName: true,
                 discord: true,
                 points: true,
                 progress: {
@@ -24,7 +23,6 @@ export async function GET() {
 
         const leaderboard = users.map((u, i) => ({
             rank: i + 1,
-            fullName: u.fullName,
             discord: u.discord,
             points: u.points,
             completedCount: u._count.progress,

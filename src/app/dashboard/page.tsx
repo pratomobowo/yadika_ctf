@@ -33,7 +33,6 @@ const ctfLevels = [
 
 interface LeaderboardEntry {
     rank: number;
-    fullName: string;
     discord: string;
     points: number;
     completedCount: number;
@@ -93,8 +92,8 @@ export default function DashboardPage() {
                 {/* Points Badge */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-lg font-bold text-foreground">Halo, {user.fullName}! 👋</h2>
-                        <p className="text-xs text-foreground/40 font-mono">@{user.discord}</p>
+                        <h2 className="text-lg font-bold text-foreground">Halo, {user.discord}! 👋</h2>
+                        <p className="text-xs text-foreground/40 font-mono">Platform Pembelajaraan DevOps</p>
                     </div>
                     <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg">
                         <Star size={14} className="text-amber-400" />
@@ -206,7 +205,7 @@ export default function DashboardPage() {
                             <div className="space-y-0.5">
                                 <div className="grid grid-cols-12 gap-2 px-2.5 py-1.5 text-[10px] text-foreground/30 font-mono uppercase tracking-wider">
                                     <div className="col-span-1">#</div>
-                                    <div className="col-span-7">Nama</div>
+                                    <div className="col-span-7">Discord Tag</div>
                                     <div className="col-span-4 text-right">Poin</div>
                                 </div>
                                 {leaderboard.map((entry) => {
@@ -227,8 +226,8 @@ export default function DashboardPage() {
                                                 )}
                                             </div>
                                             <div className="col-span-7 truncate">
-                                                <span className={`text-xs font-mono ${isMe ? 'text-primary font-bold' : 'text-foreground/80'}`}>
-                                                    {entry.fullName}
+                                                <span className={`text-xs font-mono translate-y-[-1px] ${isMe ? 'text-primary font-bold' : 'text-foreground/80'}`}>
+                                                    @{entry.discord}
                                                 </span>
                                             </div>
                                             <div className="col-span-4 text-right">

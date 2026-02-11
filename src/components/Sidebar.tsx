@@ -104,7 +104,7 @@ export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
                         <User size={20} />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-sm font-bold text-foreground truncate max-w-[140px]">{user?.fullName || 'Cadet'}</span>
+                        <span className="text-sm font-bold text-foreground truncate max-w-[140px]">@{user?.discord || 'Cadet'}</span>
                         <span className="text-[10px] text-terminal font-mono uppercase tracking-wider">{user?.progress.length || 0} Levels Solved</span>
                     </div>
                 </div>
