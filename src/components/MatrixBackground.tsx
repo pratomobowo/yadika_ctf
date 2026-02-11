@@ -16,17 +16,18 @@ export const MatrixBackground: React.FC = () => {
         let height = canvas.height = window.innerHeight;
 
         const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>?/\\";
-        const fontSize = 14;
+        const fontSize = 16;
         const columns = Math.floor(width / fontSize);
         const drops: number[] = new Array(columns).fill(0).map(() => Math.random() * -height / fontSize);
 
         const draw = () => {
             // Semi-transparent black to create trailing effect
-            ctx.fillStyle = 'rgba(10, 10, 12, 0.1)';
+            // Lower alpha = thicker/longer trails
+            ctx.fillStyle = 'rgba(10, 10, 12, 0.05)';
             ctx.fillRect(0, 0, width, height);
 
             ctx.fillStyle = '#00ff41'; // Matrix Green
-            ctx.font = `${fontSize}px monospace`;
+            ctx.font = `bold ${fontSize}px monospace`;
 
             for (let i = 0; i < drops.length; i++) {
                 const text = characters.charAt(Math.floor(Math.random() * characters.length));
@@ -50,7 +51,7 @@ export const MatrixBackground: React.FC = () => {
         const handleResize = () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            // No need to reset drops on resize as it might look jarring
+            // Re-adjust columns if needed, though usually characters will just clip or extend
         };
 
         window.addEventListener('resize', handleResize);
@@ -64,7 +65,7 @@ export const MatrixBackground: React.FC = () => {
     return (
         <canvas
             ref={canvasRef}
-            className="fixed inset-0 pointer-events-none opacity-[0.08]"
+            className="fixed inset-0 pointer-events-none opacity-[0.2]"
             style={{ zIndex: 0 }}
         />
     );
