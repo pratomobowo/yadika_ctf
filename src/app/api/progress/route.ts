@@ -9,6 +9,11 @@ const FLAGS: { [level: number]: string } = {
     3: 'yadika{gr3p_m4st3r}',
     4: 'yadika{p1p3_dr34m3r}',
     5: 'yadika{ch0wn_th3_w0rld}',
+    6: 'yadika{ps_aux_grep}',
+    7: 'yadika{redir_master_ok}',
+    8: 'yadika{env_var_found}',
+    9: 'yadika{web_root_explorer}',
+    10: 'yadika{bash_script_hero}',
 };
 
 export async function GET() {
@@ -96,7 +101,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        await prisma.user.update({
+        await (prisma.user as any).update({
             where: { id: session.id },
             data: { points: { increment: pointsToAward } },
         });
