@@ -25,6 +25,17 @@ const STAGE4 = { themeColor: 'pink-400', themeBorder: 'border-pink-500/30', them
 const STAGE5 = { themeColor: 'rose-400', themeBorder: 'border-rose-500/30', themeShadow: 'shadow-[0_0_30px_rgba(251,113,133,0.15)]' };
 
 export const ctfLevelData: CTFLevel[] = [
+    // ============ STAGE 1: Linux Fundamentals (1-10) ============
+    { id: 1, title: 'Welcome to the Shell', flag: 'yadika{shell_king}', points: 20, hint: 'Gunakan perintah ls dan cat.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 2, title: 'The Hidden Message', flag: 'yadika{b4se64_d3c0d3r}', points: 20, hint: 'Gunakan echo dan base64 --decode.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 3, title: 'Needle in a Haystack', flag: 'yadika{gr3p_m4st3r}', points: 20, hint: 'Gunakan grep.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 4, title: 'Pipelining', flag: 'yadika{p1p3_dr34m3r}', points: 20, hint: 'Gunakan pipe (|).', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 5, title: 'Strict Rules', flag: 'yadika{ch0wn_th3_w0rld}', points: 20, hint: 'Pahami chmod dan chown.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 6, title: 'Process Hunting', flag: 'yadika{ps_aux_grep}', points: 20, hint: 'Gunakan ps aux.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 7, title: 'Output Master', flag: 'yadika{redir_master_ok}', points: 20, hint: 'Gunakan redirection (>).', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 8, title: 'Environment Secrets', flag: 'yadika{env_var_found}', points: 20, hint: 'Gunakan env atau printenv.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 9, title: 'Web Recon', flag: 'yadika{web_root_explorer}', points: 20, hint: 'Cari flag di web folder.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    { id: 10, title: 'Bash Script Runner', flag: 'yadika{bash_script_hero}', points: 20, hint: 'Jalankan script .sh.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
     // ============ STAGE 2: Intermediate Linux (11-20) ============
     {
         id: 11, title: 'Find the Needle', flag: 'yadika{f1nd_th3_n33dl3}', points: 25,

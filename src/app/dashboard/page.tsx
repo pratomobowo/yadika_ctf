@@ -9,6 +9,7 @@ import {
     Trophy, Star, Target, ArrowRight,
     CheckCircle2, Circle, Lock, Zap, Medal, BookOpen, Terminal, Shield
 } from 'lucide-react';
+import { ctfLevelData } from '@/lib/ctfLevels';
 
 const sessionModules = [
     { level: 1001, title: 'Instalasi Ubuntu Server', href: '/play/session/1' },
@@ -18,18 +19,11 @@ const sessionModules = [
     { level: 1005, title: 'User & Permission', href: '/play/session/5' },
 ];
 
-const ctfLevels = [
-    { level: 1, title: 'Welcome to the Shell', href: '/play/1' },
-    { level: 2, title: 'The Hidden Message', href: '/play/2' },
-    { level: 3, title: 'Needle in a Haystack', href: '/play/3' },
-    { level: 4, title: 'Pipelining', href: '/play/4' },
-    { level: 5, title: 'Strict Rules', href: '/play/5' },
-    { level: 6, title: 'Process Hunting', href: '/play/6' },
-    { level: 7, title: 'Output Master', href: '/play/7' },
-    { level: 8, title: 'Environment Secrets', href: '/play/8' },
-    { level: 9, title: 'Web Recon', href: '/play/9' },
-    { level: 10, title: 'Bash Script Runner', href: '/play/10' },
-];
+const ctfLevels = ctfLevelData.map(l => ({
+    level: l.id,
+    title: l.title,
+    href: `/play/${l.id}`
+}));
 
 interface LeaderboardEntry {
     rank: number;
