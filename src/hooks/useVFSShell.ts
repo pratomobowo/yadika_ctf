@@ -208,7 +208,16 @@ export const useVFSShell = (options: VFSShellOptions) => {
                         output = [{ text: '(direktori kosong)', type: 'system' }];
                     } else if (showLong) {
                         output = entries.map(name => {
-                            const child = node.children![name];
+                            let child = node.children?.[name];
+                            if (name === '.') child = node;
+                            if (name === '..') {
+                                // For simplicity, we just use node as parent if at root, 
+                                // otherwise we'd need more complex lookup. Root is /
+                                child = node; // Fallback
+                            }
+
+                            if (!child) return { text: name, type: 'output' as const };
+
                             const typeStr = child.type === 'directory' ? 'd' : '-';
                             const perms = child.permissions || (child.type === 'directory' ? 'rwxr-xr-x' : 'rw-r--r--');
                             const owner = child.owner || 'guest';
@@ -217,7 +226,11 @@ export const useVFSShell = (options: VFSShellOptions) => {
                         });
                     } else {
                         const formatted = entries.map(name => {
-                            const child = node.children![name];
+                            let child = node.children?.[name];
+                            if (name === '.') child = node;
+                            if (name === '..') child = node; // Fallback
+
+                            if (!child) return name;
                             return child.type === 'directory' ? `\x1b[34m${name}/\x1b[0m` : name;
                         }).join('  ');
                         output = [{ text: formatted, type: 'output' }];
