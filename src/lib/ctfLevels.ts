@@ -351,7 +351,7 @@ export const ctfLevelData: CTFLevel[] = [
                     type: 'directory', children: {
                         'guest': {
                             type: 'directory', children: {
-                                'readme.txt': { type: 'file', content: 'Flag tersembunyi di suatu tempat dalam sistem.\nGunakan: find / -name "*.flag"' }
+                                'readme.txt': { type: 'file', content: 'Flag tersembunyi jauh di dalam labirin folder sistem.\nCoba temukan file yang berakhiran ".flag" di seluruh sistem.' }
                             }
                         }
                     }
@@ -409,7 +409,7 @@ export const ctfLevelData: CTFLevel[] = [
                     type: 'directory', children: {
                         'guest': {
                             type: 'directory', children: {
-                                'readme.txt': { type: 'file', content: 'Ada cron job mencurigakan yang berjalan di sistem.\nCoba cek: crontab -l' }
+                                'readme.txt': { type: 'file', content: 'Sistem ini menjalankan tugas otomatis secara berkala.\nPeriksa daftar tugas terjadwal (schedule) milik user saat ini.' }
                             }
                         }
                     }
@@ -441,7 +441,7 @@ export const ctfLevelData: CTFLevel[] = [
                     type: 'directory', children: {
                         'guest': {
                             type: 'directory', children: {
-                                'clue.txt': { type: 'file', content: 'Ada symlink di /tmp/shortcut. Ikuti jejaknya!' },
+                                'clue.txt': { type: 'file', content: 'Ada jalan pintas (shortcut) di /tmp/shortcut.\nCari tahu ke mana jalan pintas itu mengarah.' },
                                 'final_destination.txt': { type: 'file', content: '[REDACTED]' }
                             }
                         }
@@ -471,7 +471,7 @@ export const ctfLevelData: CTFLevel[] = [
                         'guest': {
                             type: 'directory', children: {
                                 'backup.tar.gz': { type: 'file', content: '[compressed archive]' },
-                                'readme.txt': { type: 'file', content: 'Ekstrak backup.tar.gz menggunakan:\ntar xzf backup.tar.gz' }
+                                'readme.txt': { type: 'file', content: 'Terdapat file cadangan backup.tar.gz yang dikompresi.\nBongkar arsip tersebut untuk melihat isinya.' }
                             }
                         }
                     }
@@ -507,7 +507,7 @@ export const ctfLevelData: CTFLevel[] = [
                     type: 'directory', children: {
                         'guest': {
                             type: 'directory', children: {
-                                'readme.txt': { type: 'file', content: 'Cek partisi mana yang paling penuh.\nGunakan: df -h' }
+                                'readme.txt': { type: 'file', content: 'Sistem penyimpanan hampir penuh.\nIdentifikasi partisi mana yang mencapai kapasitas Use% 100%.' }
                             }
                         }
                     }
@@ -548,7 +548,7 @@ export const ctfLevelData: CTFLevel[] = [
                     type: 'directory', children: {
                         'guest': {
                             type: 'directory', children: {
-                                'readme.txt': { type: 'file', content: 'Ada log mencurigakan di /var/log/auth.log\nCari baris yang mengandung "ALERT"' }
+                                'readme.txt': { type: 'file', content: 'Sistem mencatat aktivitas mencurigakan di /var/log/auth.log.\nCari baris yang mengandung pesan peringatan "ALERT".' }
                             }
                         }
                     }
@@ -576,7 +576,7 @@ export const ctfLevelData: CTFLevel[] = [
                     type: 'directory', children: {
                         'guest': {
                             type: 'directory', children: {
-                                'readme.txt': { type: 'file', content: 'Ada user mencurigakan di sistem.\nPeriksa /etc/passwd dan cari yang tidak biasa.' }
+                                'readme.txt': { type: 'file', content: 'Daftar pengguna sistem disimpan di /etc/passwd.\nAda penyusup yang menyisipkan flag di dalam informasi akun salah satu user.' }
                             }
                         }
                     }
@@ -599,7 +599,7 @@ export const ctfLevelData: CTFLevel[] = [
                     type: 'directory', children: {
                         'guest': {
                             type: 'directory', children: {
-                                'readme.txt': { type: 'file', content: 'Cek konfigurasi jaringan.\nGunakan: ip addr atau ifconfig' }
+                                'readme.txt': { type: 'file', content: 'Informasi kartu jaringan mungkin menyimpan rahasia.\nLihat detail alamat IP dan konfigurasi interface server ini.' }
                             }
                         }
                     }
@@ -635,7 +635,7 @@ export const ctfLevelData: CTFLevel[] = [
                         'guest': {
                             type: 'directory', children: {
                                 'encoded.txt': { type: 'file', content: 'yXdikX{s3d_surg30n}' },
-                                'readme.txt': { type: 'file', content: 'File encoded.txt berisi flag yang ter-encode.\nHuruf "a" diganti "X".\nGunakan sed untuk mengembalikan:\nsed "s/X/a/g" encoded.txt' }
+                                'readme.txt': { type: 'file', content: 'Flag di dalam encoded.txt sedikit rusak.\nSepertinya semua huruf "a" berubah menjadi "X".\nGunakan editor teks otomatis (Stream Editor) untuk memperbaikinya.' }
                             }
                         }
                     }
@@ -666,7 +666,7 @@ export const ctfLevelData: CTFLevel[] = [
                         'guest': {
                             type: 'directory', children: {
                                 'data.csv': { type: 'file', content: '[REDACTED]' },
-                                'readme.txt': { type: 'file', content: 'Ekstrak kolom ketiga dari data.csv.\nCari baris milik "hacker".\nGunakan: awk -F"," \'/hacker/ {print $3}\' data.csv' }
+                                'readme.txt': { type: 'file', content: 'Data rahasia tersimpan di data.csv.\nAmbil nilai di kolom ketiga ($3) hanya untuk baris milik "hacker".' }
                             }
                         }
                     }
