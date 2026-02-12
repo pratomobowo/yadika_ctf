@@ -26,12 +26,21 @@ export default function UserManagementPage() {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
-    const fetchUsers = async () => {
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalUsers, setTotalUsers] = useState(0);
+    const limit = 20;
+
+    const fetchUsers = async (page = 1) => {
         setLoading(true);
         try {
-            const res = await fetch('/api/admin/users');
+            const res = await fetch(`/api/admin/users?page=${page}&limit=${limit}`);
             const data = await res.json();
             setUsers(data.users || []);
+            setTotalPages(data.pagination?.pages || 1);
+            setTotalUsers(data.pagination?.total || 0);
+            setCurrentPage(data.pagination?.currentPage || 1);
         } catch (error) {
             console.error('Failed to fetch users:', error);
         } finally {
@@ -112,7 +121,7 @@ export default function UserManagementPage() {
                         <Users size={20} />
                         <span className="text-[10px] font-mono tracking-widest uppercase opacity-60">Total Students</span>
                     </div>
-                    <div className="text-3xl font-black font-mono">{users.length}</div>
+                    <div className="text-3xl font-black font-mono">{totalUsers}</div>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-xl p-6">
                     <div className="flex items-center gap-3 text-green-500 mb-2">
@@ -147,7 +156,7 @@ export default function UserManagementPage() {
                     />
                 </div>
                 <button
-                    onClick={fetchUsers}
+                    onClick={() => fetchUsers(currentPage)}
                     className="p-2.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-foreground/60"
                 >
                     <RotateCcw size={16} />
@@ -232,6 +241,47 @@ export default function UserManagementPage() {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {!loading && totalPages > 1 && (
+                    <div className="border-t border-white/5 px-6 py-4 flex items-center justify-between">
+                        <div className="text-[10px] font-mono text-foreground/40 uppercase">
+                            Showing <span className="text-white">{(currentPage - 1) * limit + 1}</span> to <span className="text-white">{Math.min(currentPage * limit, totalUsers)}</span> of <span className="text-white">{totalUsers}</span> students
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => fetchUsers(currentPage - 1)}
+                                disabled={currentPage <= 1}
+                                className="px-3 py-1 bg-white/5 border border-white/10 rounded text-[10px] font-mono uppercase hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            >
+                                Previous
+                            </button>
+
+                            <div className="flex items-center gap-1">
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                                    <button
+                                        key={p}
+                                        onClick={() => fetchUsers(p)}
+                                        className={`w-7 h-7 flex items-center justify-center rounded text-[10px] font-mono transition-all ${p === currentPage
+                                                ? 'bg-primary text-black font-bold'
+                                                : 'hover:bg-white/10 text-foreground/40'
+                                            }`}
+                                    >
+                                        {p}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <button
+                                onClick={() => fetchUsers(currentPage + 1)}
+                                disabled={currentPage >= totalPages}
+                                className="px-3 py-1 bg-white/5 border border-white/10 rounded text-[10px] font-mono uppercase hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Edit Modal */}
