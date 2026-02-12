@@ -200,6 +200,10 @@ export const useVFSShell = (options: VFSShellOptions) => {
                         .filter(name => showHidden || !name.startsWith('.'))
                         .sort();
 
+                    if (showHidden) {
+                        entries.unshift('.', '..');
+                    }
+
                     if (entries.length === 0) {
                         output = [{ text: '(direktori kosong)', type: 'system' }];
                     } else if (showLong) {

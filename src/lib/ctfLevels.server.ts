@@ -134,14 +134,169 @@ export const ctfLevelData: CTFLevel[] = [
             }
         }
     },
-    { id: 3, title: 'Needle in a Haystack', flag: 'yadika{gr3p_m4st3r}', points: 20, hint: 'Gunakan grep.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
-    { id: 4, title: 'Pipelining', flag: 'yadika{p1p3_dr34m3r}', points: 20, hint: 'Gunakan pipe (|).', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
-    { id: 5, title: 'Strict Rules', flag: 'yadika{ch0wn_th3_w0rld}', points: 20, hint: 'Pahami chmod dan chown.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
-    { id: 6, title: 'Process Hunting', flag: 'yadika{ps_aux_grep}', points: 20, hint: 'Gunakan ps aux.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
-    { id: 7, title: 'Output Master', flag: 'yadika{redir_master_ok}', points: 20, hint: 'Gunakan redirection (>).', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
-    { id: 8, title: 'Environment Secrets', flag: 'yadika{env_var_found}', points: 20, hint: 'Gunakan env atau printenv.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
-    { id: 9, title: 'Web Recon', flag: 'yadika{web_root_explorer}', points: 20, hint: 'Cari flag di web folder.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
-    { id: 10, title: 'Bash Script Runner', flag: 'yadika{bash_script_hero}', points: 20, hint: 'Jalankan script .sh.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]', filesystem: { type: 'directory', children: {} } },
+    {
+        id: 3, title: 'Needle in a Haystack', flag: 'yadika{gr3p_m4st3r}', points: 20, hint: 'Gunakan grep.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: {
+            type: 'directory', children: {
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'logs': {
+                                    type: 'directory', children: {
+                                        'access.log': { type: 'file', content: '192.168.1.1 - - [2026-02-12 10:00:01] "GET /index.html HTTP/1.1" 200\n192.168.1.2 - - [2026-02-12 10:05:22] "GET /login HTTP/1.1" 200\n192.168.1.5 - - [2026-02-12 10:10:45] "POST /api/flag HTTP/1.1" 200 yadika{gr3p_m4st3r}' },
+                                        'error.log': { type: 'file', content: 'ERROR: 404 Not Found /favicon.ico\nERROR: 500 Internal Server Error /upload' }
+                                    }
+                                },
+                                'readme.txt': { type: 'file', content: 'Dapatkan flag dari access.log di dalam folder logs.\nGunakan grep untuk mencari "yadika{"' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        id: 4, title: 'Pipelining', flag: 'yadika{p1p3_dr34m3r}', points: 20, hint: 'Gunakan pipe (|).', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: {
+            type: 'directory', children: {
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'data.txt': { type: 'file', content: 'line 1\nline 2\nline 3\nSECRET: yadika{p1p3_dr34m3r}\nline 5' },
+                                'readme.txt': { type: 'file', content: 'Gunakan cat dan grep dengan pipe untuk menemukan flag.\nContoh: cat data.txt | grep yadika' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        id: 5, title: 'Strict Rules', flag: 'yadika{ch0wn_th3_w0rld}', points: 20, hint: 'Pahami chmod.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: {
+            type: 'directory', children: {
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'locked_file.txt': { type: 'file', content: 'yadika{ch0wn_th3_w0rld}', permissions: '---------' },
+                                'readme.txt': { type: 'file', content: 'File locked_file.txt tidak bisa dibaca.\nUbah permission-nya agar bisa dibaca.\nGunakan: chmod 644 locked_file.txt' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        id: 6, title: 'Process Hunting', flag: 'yadika{ps_aux_grep}', points: 20, hint: 'Gunakan ps aux.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: {
+            type: 'directory', children: {
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'readme.txt': { type: 'file', content: 'Cari flag di daftar proses yang sedang berjalan.\nGunakan: ps aux | grep hacker' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        id: 7, title: 'Output Master', flag: 'yadika{redir_master_ok}', points: 20, hint: 'Gunakan redirection (>).', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: {
+            type: 'directory', children: {
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'readme.txt': { type: 'file', content: 'Ketik "echo <flag>" dan arahkan ke file flag.txt.\nFlagnya adalah: yadika{redir_master_ok}' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        id: 8, title: 'Environment Secrets', flag: 'yadika{env_var_found}', points: 20, hint: 'Gunakan env atau printenv.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: {
+            type: 'directory', children: {
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'readme.txt': { type: 'file', content: 'Flag tersembunyi di Environment Variable.\nGunakan perintah env atau printenv.' }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        initialEnv: { 'FLAG': 'yadika{env_var_found}', 'SECRET_KEY': '12345' }
+    },
+    {
+        id: 9, title: 'Web Recon', flag: 'yadika{web_root_explorer}', points: 20, hint: 'Cari flag di web folder.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: {
+            type: 'directory', children: {
+                'var': {
+                    type: 'directory', children: {
+                        'www': {
+                            type: 'directory', children: {
+                                'html': {
+                                    type: 'directory', children: {
+                                        'index.html': { type: 'file', content: '<h1>It Works!</h1>' },
+                                        '.htaccess': { type: 'file', content: 'Flag: yadika{web_root_explorer}' }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'readme.txt': { type: 'file', content: 'Cari flag di folder /var/www/html.\nJangan lupa cek file tersembunyi dengan ls -la' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    {
+        id: 10, title: 'Bash Script Runner', flag: 'yadika{bash_script_hero}', points: 20, hint: 'Jalankan script .sh.', themeColor: 'primary', themeBorder: 'border-primary/30', themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: {
+            type: 'directory', children: {
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'get_flag.sh': { type: 'file', content: '#!/bin/bash\necho "Running script..."\nsleep 1\necho "Flag: yadika{bash_script_hero}"', permissions: 'rwxr-xr-x' },
+                                'readme.txt': { type: 'file', content: 'Ada script get_flag.sh. Jalankan script tersebut!\nGunakan: ./get_flag.sh' }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        customCommands: (cmd, args, _cp, addLines) => {
+            if (cmd === './get_flag.sh') {
+                addLines([
+                    { text: 'Running script...', type: 'output' },
+                    { text: 'Flag: yadika{bash_script_hero}', type: 'success' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
+            return false;
+        }
+    },
     // ============ STAGE 2: Intermediate Linux (11-20) ============
     {
         id: 11, title: 'Find the Needle', flag: 'yadika{f1nd_th3_n33dl3}', points: 25,
