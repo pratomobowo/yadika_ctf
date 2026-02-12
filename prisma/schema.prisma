@@ -16,6 +16,7 @@ model User {
   points    Int        @default(0)
   createdAt DateTime   @default(now())
   progress  Progress[]
+  quizAttempts QuizAttempt[]
 }
 
 model Progress {
@@ -27,4 +28,24 @@ model Progress {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, level])
+}
+
+model Quiz {
+  id            String        @id @default(cuid())
+  question      String
+  options       String[]
+  correctAnswer Int
+  points        Int           @default(2)
+  createdAt     DateTime      @default(now())
+  attempts      QuizAttempt[]
+}
+
+model QuizAttempt {
+  id          String   @id @default(cuid())
+  userId      String
+  quizId      String
+  isCorrect   Boolean
+  attemptedAt DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }

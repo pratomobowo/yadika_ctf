@@ -57,29 +57,24 @@ export async function POST(request: NextRequest) {
         }
 
         let correctFlag = '';
-        let pointsToAward = 10; // Default for modules
+        let pointsToAward = 10;
 
-        if (level < 1000) {
-            // It's a CTF level
-            const levelData = getLevelById(level);
-            correctFlag = levelData?.flag || '';
-            pointsToAward = levelData?.points || 20;
+        const levelData = getLevelById(level);
+        if (!levelData) {
+            return NextResponse.json(
+                { error: 'Level tidak valid' },
+                { status: 400 }
+            );
+        }
 
-            if (!correctFlag || flag.toLowerCase() !== correctFlag.toLowerCase()) {
-                return NextResponse.json(
-                    { error: 'Flag salah!', correct: false },
-                    { status: 400 }
-                );
-            }
-        } else {
-            // It's a Module level
-            correctFlag = MODULE_FLAGS[level] || '';
-            if (!correctFlag || flag.toLowerCase() !== correctFlag.toLowerCase()) {
-                return NextResponse.json(
-                    { error: 'Flag salah!', correct: false },
-                    { status: 400 }
-                );
-            }
+        correctFlag = levelData.flag;
+        pointsToAward = levelData.points || (level >= 1000 ? 10 : 20);
+
+        if (flag.toLowerCase() !== correctFlag.toLowerCase()) {
+            return NextResponse.json(
+                { error: 'Flag salah!', correct: false },
+                { status: 400 }
+            );
         }
 
         // Check if already completed

@@ -56,7 +56,9 @@ const ctfLevels = ctfLevelData.map(l => ({ id: l.id, title: l.title }));
 export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
     const { user, isLevelCompleted, isLevelUnlocked, logout } = useAuth();
     const [isSessionsOpen, setIsSessionsOpen] = useState(true);
-    const [isCTFOpen, setIsCTFOpen] = useState(false);
+    const [isEasyOpen, setIsEasyOpen] = useState(true);
+    const [isNormalOpen, setIsNormalOpen] = useState(false);
+    const [isHardOpen, setIsHardOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => { setMounted(true); }, []);
@@ -200,77 +202,106 @@ export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
                         </AnimatePresence>
                     </div>
 
-                    {/* Special CTF Section */}
-                    <div className="flex flex-col gap-1">
-                        <button
-                            onClick={() => setIsCTFOpen(!isCTFOpen)}
-                            className="flex items-center justify-between gap-2 px-2 py-2 text-foreground/40 hover:text-secondary transition-colors hover:bg-white/5 rounded-md group"
-                        >
-                            <div className="flex items-center gap-2">
-                                <Shield size={16} />
-                                <span className="text-xs font-bold font-mono tracking-widest uppercase">Special CTF</span>
-                            </div>
-                            {isCTFOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                        </button>
+                    {/* Special CTF Sections */}
+                    <div className="flex flex-col gap-1 border-t border-terminal/10 pt-2">
+                        <div className="px-3 pb-2 flex items-center gap-2 text-foreground/40">
+                            <Shield size={14} />
+                            <span className="text-[10px] font-bold font-mono tracking-widest uppercase">Special CTF</span>
+                        </div>
 
-                        <AnimatePresence>
-                            {isCTFOpen && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="flex flex-col gap-1 pl-4 overflow-hidden"
-                                >
-                                    {ctfLevels.map((lvl) => {
-                                        const completed = isLevelCompleted(lvl.id);
-                                        const unlocked = isLevelUnlocked(lvl.id);
-                                        const isCurrent = lvl.id === currentLevel;
+                        {/* EASY SECTION */}
+                        <div className="flex flex-col gap-1">
+                            <button
+                                onClick={() => setIsEasyOpen(!isEasyOpen)}
+                                className="flex items-center justify-between gap-2 px-2 py-2 text-foreground/60 hover:text-green-400 transition-colors hover:bg-white/5 rounded-md group"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <ChevronRight size={14} className={`transition-transform duration-200 ${isEasyOpen ? 'rotate-90' : ''}`} />
+                                    <span className="text-[11px] font-bold font-mono uppercase">Difficulty: Easy</span>
+                                </div>
+                            </button>
 
-                                        const itemContent = (
-                                            <>
-                                                {completed ? (
-                                                    <CheckCircle2 size={14} className="text-green-500 shrink-0" />
-                                                ) : unlocked ? (
-                                                    <Circle size={14} className="shrink-0" />
-                                                ) : (
-                                                    <Lock size={14} className="text-foreground/20 shrink-0" />
-                                                )}
-                                                <span className="text-[12px] font-mono truncate">
-                                                    Lvl {lvl.id}: {lvl.title}
-                                                </span>
-                                            </>
-                                        );
+                            <AnimatePresence>
+                                {isEasyOpen && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="flex flex-col gap-1 pl-4 overflow-hidden"
+                                    >
+                                        {ctfLevels.slice(0, 20).map((lvl) => {
+                                            const completed = isLevelCompleted(lvl.id);
+                                            const unlocked = isLevelUnlocked(lvl.id);
+                                            const isCurrent = lvl.id === currentLevel;
 
-                                        if (!unlocked && !isCurrent) {
+                                            const itemContent = (
+                                                <>
+                                                    {completed ? (
+                                                        <CheckCircle2 size={12} className="text-green-500 shrink-0" />
+                                                    ) : unlocked ? (
+                                                        <Circle size={12} className="shrink-0" />
+                                                    ) : (
+                                                        <Lock size={12} className="text-foreground/20 shrink-0" />
+                                                    )}
+                                                    <span className="text-[11px] font-mono truncate">
+                                                        Lvl {lvl.id}: {lvl.title}
+                                                    </span>
+                                                </>
+                                            );
+
+                                            if (!unlocked && !isCurrent) {
+                                                return (
+                                                    <div
+                                                        key={lvl.id}
+                                                        className="flex items-center gap-2 p-1.5 rounded-md text-foreground/20 cursor-not-allowed grayscale"
+                                                        title="Selesaikan level sebelumnya untuk membuka"
+                                                    >
+                                                        {itemContent}
+                                                    </div>
+                                                );
+                                            }
+
                                             return (
-                                                <div
+                                                <Link
                                                     key={lvl.id}
-                                                    className="flex items-center gap-2 p-2 rounded-md text-foreground/20 cursor-not-allowed grayscale"
-                                                    title="Selesaikan level sebelumnya untuk membuka"
+                                                    href={`/play/${lvl.id}`}
+                                                    className={`flex items-center gap-2 p-1.5 rounded-md transition-colors ${isCurrent
+                                                        ? 'bg-terminal/10 text-terminal border border-terminal/20'
+                                                        : completed
+                                                            ? 'text-green-400/70 hover:bg-white/5'
+                                                            : 'text-foreground/60 hover:bg-white/5 hover:text-foreground'
+                                                        }`}
                                                 >
                                                     {itemContent}
-                                                </div>
+                                                </Link>
                                             );
-                                        }
+                                        })}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
 
-                                        return (
-                                            <Link
-                                                key={lvl.id}
-                                                href={`/play/${lvl.id}`}
-                                                className={`flex items-center gap-2 p-2 rounded-md transition-colors ${isCurrent
-                                                    ? 'bg-terminal/10 text-terminal border border-terminal/20 shadow-[0_0_15px_rgba(0,255,159,0.1)]'
-                                                    : completed
-                                                        ? 'text-green-400/70 hover:bg-white/5'
-                                                        : 'text-foreground/60 hover:bg-white/5 hover:text-foreground'
-                                                    }`}
-                                            >
-                                                {itemContent}
-                                            </Link>
-                                        );
-                                    })}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        {/* NORMAL SECTION (LOCKED) */}
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-center justify-between gap-2 px-2 py-2 text-foreground/20 cursor-not-allowed grayscale rounded-md">
+                                <div className="flex items-center gap-2">
+                                    <Lock size={14} />
+                                    <span className="text-[11px] font-bold font-mono uppercase">Difficulty: Normal</span>
+                                </div>
+                                <span className="text-[9px] font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5">LOCKED</span>
+                            </div>
+                        </div>
+
+                        {/* HARD SECTION (LOCKED) */}
+                        <div className="flex flex-col gap-1">
+                            <div className="flex items-center justify-between gap-2 px-2 py-2 text-foreground/20 cursor-not-allowed grayscale rounded-md">
+                                <div className="flex items-center gap-2">
+                                    <Lock size={14} />
+                                    <span className="text-[11px] font-bold font-mono uppercase">Difficulty: Hard</span>
+                                </div>
+                                <span className="text-[9px] font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5">LOCKED</span>
+                            </div>
+                        </div>
                     </div>
                 </nav>
 

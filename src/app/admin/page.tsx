@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import {
     Users, Search, Filter, MoreVertical, Edit2,
     Trash2, RotateCcw, Shield, CheckCircle2,
-    Clock, Medal, X, Save, AlertTriangle, Download
+    Clock, Medal, X, Save, AlertTriangle, Download, Brain
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 interface User {
     id: string;
@@ -192,6 +193,14 @@ export default function UserManagementPage() {
                     <Download size={16} />
                     <span className="hidden md:inline text-xs font-mono font-bold uppercase">{actionLoading === 'exporting' ? 'EXPORTING...' : 'EXPORT EXCEL'}</span>
                 </button>
+                <Link
+                    href="/admin/quiz"
+                    className="p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20 transition-colors text-amber-500 flex items-center gap-2"
+                    title="Manage Quizzes"
+                >
+                    <Brain size={16} />
+                    <span className="hidden md:inline text-xs font-mono font-bold uppercase">QUIZ MANAGER</span>
+                </Link>
             </div>
 
             {/* Users Table */}

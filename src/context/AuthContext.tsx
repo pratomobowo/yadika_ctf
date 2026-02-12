@@ -120,13 +120,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Admins have everything unlocked
         if (user?.role === 'ADMIN') return true;
 
-        // Special CTF Levels (1-5)
+        // Session Levels (1001+)
+        if (level >= 1001 && level <= 1005) {
+            if (level === 1001) return true; // Sesi 1 unlocked
+            return isLevelCompleted(level - 1);
+        }
+
+        // Special CTF Levels (1-10) - require completion of Module 5
         if (level === 1) return isLevelCompleted(1005);
         if (level < 1000) return isLevelCompleted(level - 1);
 
-        // Session Levels (1000+)
-        if (level === 1001) return true; // Sesi 1 unlocked
-        return isLevelCompleted(level - 1);
+        return true; // Default
     }, [user, isLevelCompleted]);
 
     return (

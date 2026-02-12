@@ -10,6 +10,7 @@ import {
     CheckCircle2, Circle, Lock, Zap, Medal, BookOpen, Terminal, Shield
 } from 'lucide-react';
 import { ctfLevelData } from '@/lib/ctfLevels';
+import DailyQuizCard from '@/components/DailyQuizCard';
 
 const sessionModules = [
     { level: 1001, title: 'Instalasi Ubuntu Server', href: '/play/session/1' },
@@ -148,6 +149,11 @@ export default function DashboardPage() {
                 </motion.div>
 
                 <div className="grid md:grid-cols-2 gap-4">
+                    {/* Daily Quiz */}
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
+                        className="md:col-span-2 h-full">
+                        <DailyQuizCard />
+                    </motion.div>
                     {/* Module Progress */}
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
                         className="bg-white/5 border border-white/10 rounded-lg p-4">
