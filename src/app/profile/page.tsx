@@ -17,8 +17,13 @@ const levels = [
 ];
 
 export default function ProfilePage() {
-    const { user, loading, isLevelCompleted, isLevelUnlocked } = useAuth();
+    const { user, loading, isLevelCompleted, isLevelUnlocked, refreshUser } = useAuth();
     const router = useRouter();
+
+    const [editFullName, setEditFullName] = useState('');
+    const [editDiscord, setEditDiscord] = useState('');
+    const [profileStatus, setProfileStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+    const [profileMessage, setProfileMessage] = useState('');
 
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -32,7 +37,44 @@ export default function ProfilePage() {
         if (!loading && !user) {
             router.push('/');
         }
+        if (user) {
+            setEditFullName(user.fullName);
+            setEditDiscord(user.discord);
+        }
     }, [user, loading, router]);
+
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setProfileStatus('submitting');
+
+        try {
+            const res = await fetch('/api/auth/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fullName: editFullName, discord: editDiscord }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setProfileStatus('error');
+                setProfileMessage(data.error || 'Gagal memperbarui profil');
+                return;
+            }
+
+            await refreshUser();
+            setProfileStatus('success');
+            setProfileMessage('Profil berhasil diperbarui!');
+
+            setTimeout(() => {
+                setProfileStatus('idle');
+                setProfileMessage('');
+            }, 3000);
+        } catch {
+            setProfileStatus('error');
+            setProfileMessage('Terjadi kesalahan network');
+        }
+    };
 
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -191,91 +233,153 @@ export default function ProfilePage() {
                         </div>
                     </motion.div>
 
-                    {/* Change Password */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6 h-fit"
-                    >
-                        <div className="flex items-center gap-2 mb-4">
-                            <KeyRound size={18} className="text-primary" />
-                            <h2 className="text-sm md:text-lg font-bold font-mono uppercase tracking-tight">Ganti Password</h2>
-                        </div>
+                    <div className="space-y-4 md:space-y-6">
+                        {/* Edit Profile */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.15 }}
+                            className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6 h-fit"
+                        >
+                            <div className="flex items-center gap-2 mb-4">
+                                <User size={18} className="text-primary" />
+                                <h2 className="text-sm md:text-lg font-bold font-mono uppercase tracking-tight">Edit Profil</h2>
+                            </div>
 
-                        <form onSubmit={handleChangePassword} className="space-y-4">
-                            <div>
-                                <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Password Lama</label>
-                                <div className="relative">
+                            <form onSubmit={handleUpdateProfile} className="space-y-4">
+                                <div>
+                                    <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Nama Lengkap</label>
                                     <input
-                                        type={showCurrentPass ? 'text' : 'password'}
-                                        value={currentPassword}
-                                        onChange={(e) => setCurrentPassword(e.target.value)}
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors pr-10"
+                                        type="text"
+                                        value={editFullName}
+                                        onChange={(e) => setEditFullName(e.target.value)}
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors"
+                                        placeholder="Nama Lengkap"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">
+                                        Discord Username
+                                        {user.role !== 'ADMIN' && <span className="ml-2 text-[8px] text-amber-500/50 normal-case">(Admin only)</span>}
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={editDiscord}
+                                        onChange={(e) => setEditDiscord(e.target.value)}
+                                        disabled={user.role !== 'ADMIN'}
+                                        className={`w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors ${user.role !== 'ADMIN' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        placeholder="discord_username"
+                                        required
+                                    />
+                                </div>
+
+                                {profileMessage && (
+                                    <div className={`text-[10px] md:text-xs font-mono p-3 rounded-lg border ${profileStatus === 'success'
+                                        ? 'text-green-400 bg-green-500/5 border-green-500/20'
+                                        : 'text-red-400 bg-red-500/5 border-red-500/20'
+                                        }`}>
+                                        {profileStatus === 'success' ? '✓' : '✗'} {profileMessage}
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={profileStatus === 'submitting'}
+                                    className="w-full bg-primary/10 border border-primary/20 text-primary font-mono text-xs md:text-sm py-2.5 rounded-lg hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase font-bold tracking-widest"
+                                >
+                                    {profileStatus === 'submitting' ? 'Menyimpan...' : 'Simpan Perubahan'}
+                                </button>
+                            </form>
+                        </motion.div>
+
+                        {/* Change Password */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6 h-fit"
+                        >
+                            <div className="flex items-center gap-2 mb-4">
+                                <KeyRound size={18} className="text-primary" />
+                                <h2 className="text-sm md:text-lg font-bold font-mono uppercase tracking-tight">Ganti Password</h2>
+                            </div>
+
+                            <form onSubmit={handleChangePassword} className="space-y-4">
+                                <div>
+                                    <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Password Lama</label>
+                                    <div className="relative">
+                                        <input
+                                            type={showCurrentPass ? 'text' : 'password'}
+                                            value={currentPassword}
+                                            onChange={(e) => setCurrentPassword(e.target.value)}
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors pr-10"
+                                            placeholder="••••••••"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowCurrentPass(!showCurrentPass)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
+                                        >
+                                            {showCurrentPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Password Baru</label>
+                                    <div className="relative">
+                                        <input
+                                            type={showNewPass ? 'text' : 'password'}
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors pr-10"
+                                            placeholder="••••••••"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowNewPass(!showNewPass)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
+                                        >
+                                            {showNewPass ? <EyeOff size={14} /> : <Eye size={14} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Konfirmasi Password Baru</label>
+                                    <input
+                                        type="password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors"
                                         placeholder="••••••••"
                                         required
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowCurrentPass(!showCurrentPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
-                                    >
-                                        {showCurrentPass ? <EyeOff size={14} /> : <Eye size={14} />}
-                                    </button>
                                 </div>
-                            </div>
 
-                            <div>
-                                <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Password Baru</label>
-                                <div className="relative">
-                                    <input
-                                        type={showNewPass ? 'text' : 'password'}
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors pr-10"
-                                        placeholder="••••••••"
-                                        required
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowNewPass(!showNewPass)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/30 hover:text-foreground/60"
-                                    >
-                                        {showNewPass ? <EyeOff size={14} /> : <Eye size={14} />}
-                                    </button>
-                                </div>
-                            </div>
+                                {passwordMessage && (
+                                    <div className={`text-[10px] md:text-xs font-mono p-3 rounded-lg border ${passwordStatus === 'success'
+                                        ? 'text-green-400 bg-green-500/5 border-green-500/20'
+                                        : 'text-red-400 bg-red-500/5 border-red-500/20'
+                                        }`}>
+                                        {passwordStatus === 'success' ? '✓' : '✗'} {passwordMessage}
+                                    </div>
+                                )}
 
-                            <div>
-                                <label className="block text-[10px] text-foreground/40 font-mono mb-1.5 uppercase tracking-wider">Konfirmasi Password Baru</label>
-                                <input
-                                    type="password"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs md:text-sm font-mono text-foreground focus:outline-none focus:border-primary/40 transition-colors"
-                                    placeholder="••••••••"
-                                    required
-                                />
-                            </div>
-
-                            {passwordMessage && (
-                                <div className={`text-[10px] md:text-xs font-mono p-3 rounded-lg border ${passwordStatus === 'success'
-                                    ? 'text-green-400 bg-green-500/5 border-green-500/20'
-                                    : 'text-red-400 bg-red-500/5 border-red-500/20'
-                                    }`}>
-                                    {passwordStatus === 'success' ? '✓' : '✗'} {passwordMessage}
-                                </div>
-                            )}
-
-                            <button
-                                type="submit"
-                                disabled={passwordStatus === 'submitting'}
-                                className="w-full bg-primary/10 border border-primary/20 text-primary font-mono text-xs md:text-sm py-2.5 rounded-lg hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase font-bold tracking-widest"
-                            >
-                                {passwordStatus === 'submitting' ? 'Mengubah...' : 'Simpan Password'}
-                            </button>
-                        </form>
-                    </motion.div>
+                                <button
+                                    type="submit"
+                                    disabled={passwordStatus === 'submitting'}
+                                    className="w-full bg-primary/10 border border-primary/20 text-primary font-mono text-xs md:text-sm py-2.5 rounded-lg hover:bg-primary/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed uppercase font-bold tracking-widest"
+                                >
+                                    {passwordStatus === 'submitting' ? 'Mengubah...' : 'Simpan Password'}
+                                </button>
+                            </form>
+                        </motion.div>
+                    </div>
                 </div>
             </div>
         </SessionLayout>
