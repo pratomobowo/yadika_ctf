@@ -10,7 +10,7 @@ const SESSION_FLAG = 'yadika{file_manager_master}';
 
 export default function FileManagementPage() {
     // Note: useSubmitFlag helps with tracking progress state locally and updating context
-    const { submitFlag } = useSubmitFlag(SESSION_ID, SESSION_FLAG);
+    const { submitFlag } = useSubmitFlag(SESSION_ID);
     const router = useRouter();
 
     const handleComplete = async () => {

@@ -2,9 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { createSession } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
     try {
+        const ip = request.headers.get('x-forwarded-for') || 'unknown';
+        const limit = checkRateLimit(ip, { limit: 5, windowMs: 60 * 1000 }); // 5 attempts per minute
+
+        if (!limit.success) {
+            return NextResponse.json(
+                { error: 'Terlalu banyak percobaan login. Silakan tunggu sebentar.' },
+                { status: 429 }
+            );
+        }
+
         const body = await request.json();
         const { discord, password } = body;
 

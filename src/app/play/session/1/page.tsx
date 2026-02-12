@@ -9,7 +9,7 @@ const SESSION_ID = 1001;
 const SESSION_FLAG = 'yadika{ubuntu_installed_success}'; // This is technically unused by the new API for >1000 but required by hook
 
 export default function InstallUbuntuPage() {
-    const { submitFlag } = useSubmitFlag(SESSION_ID, SESSION_FLAG);
+    const { submitFlag } = useSubmitFlag(SESSION_ID);
     const router = useRouter();
 
     const handleComplete = async () => {

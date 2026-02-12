@@ -11,6 +11,7 @@ interface VFSShellOptions {
     levelTitle: string;
     customCommands?: (command: string, args: string[], currentPath: string, addLines: (lines: TerminalLine[]) => void) => boolean;
     initialEnv?: Record<string, string>;
+    levelId: number;
 }
 
 export const useVFSShell = (options: VFSShellOptions) => {
@@ -21,7 +22,8 @@ export const useVFSShell = (options: VFSShellOptions) => {
         user = 'guest',
         hostname = 'ctf',
         levelTitle,
-        customCommands
+        customCommands,
+        levelId
     } = options;
 
     const shell = useTerminalShell([
@@ -42,7 +44,19 @@ export const useVFSShell = (options: VFSShellOptions) => {
         ...(options.initialEnv || {})
     });
 
-    const executeSingleCommand = useCallback((cmd: string, pipeInput?: TerminalLine[]): TerminalLine[] => {
+    const fetchFileContent = async (path: string): Promise<string | null> => {
+        try {
+            const res = await fetch(`/api/levels/${levelId}/file?path=${encodeURIComponent(path)}`);
+            if (!res.ok) return null;
+            const data = await res.json();
+            return data.content;
+        } catch (e) {
+            console.error('Failed to fetch file:', e);
+            return null;
+        }
+    };
+
+    const executeSingleCommand = useCallback(async (cmd: string, pipeInput?: TerminalLine[]): Promise<TerminalLine[]> => {
         const parts = cmd.trim().split(/\s+/);
         const command = parts[0]?.toLowerCase();
         const args = parts.slice(1);
@@ -72,7 +86,21 @@ export const useVFSShell = (options: VFSShellOptions) => {
                         if (!canRead) {
                             output = [{ text: `cat: ${args[0]}: Permission denied`, type: 'error' }];
                         } else {
-                            const content = node.content || '';
+                            let content = node.content || '';
+
+                            // Lazy load content if redacted
+                            if (content === '[REDACTED]') {
+                                shell.addLines([{ text: 'Loading...', type: 'system' }]); // Optional feedback
+                                const fetched = await fetchFileContent(resolved);
+                                if (fetched !== null) {
+                                    content = fetched;
+                                    // Update cache
+                                    setFilesystem(prev => updateVFS(prev, resolved, n => ({ ...n, content: fetched })));
+                                } else {
+                                    return [{ text: `cat: error reading file`, type: 'error' }];
+                                }
+                            }
+
                             output = content.split('\n').map(text => ({ text, type: 'output' as const }));
 
                             if (content.includes('yadika{')) {
@@ -96,7 +124,15 @@ export const useVFSShell = (options: VFSShellOptions) => {
                     const resolved = resolvePath(currentPath, fileArg);
                     const node = getNode(filesystem, resolved);
                     if (node?.type === 'file') {
-                        inputLines = (node.content || '').split('\n').map(text => ({ text, type: 'output' }));
+                        let content = node.content || '';
+                        if (content === '[REDACTED]') {
+                            const fetched = await fetchFileContent(resolved);
+                            if (fetched !== null) {
+                                content = fetched;
+                                setFilesystem(prev => updateVFS(prev, resolved, n => ({ ...n, content: fetched })));
+                            }
+                        }
+                        inputLines = content.split('\n').map(text => ({ text, type: 'output' as const }));
                     } else if (node?.type === 'directory') {
                         return [{ text: `grep: ${fileArg}: Adalah direktori`, type: 'error' }];
                     } else {
@@ -128,13 +164,25 @@ export const useVFSShell = (options: VFSShellOptions) => {
                     const resolved = resolvePath(currentPath, fileArg);
                     const node = getNode(filesystem, resolved);
                     if (node?.type === 'file') {
-                        inputLines = (node.content || '').split('\n').map(text => ({ text, type: 'output' }));
+                        let content = node.content || '';
+                        if (content === '[REDACTED]') {
+                            const fetched = await fetchFileContent(resolved);
+                            if (fetched !== null) {
+                                content = fetched;
+                                setFilesystem(prev => updateVFS(prev, resolved, n => ({ ...n, content: fetched })));
+                            }
+                        }
+                        inputLines = content.split('\n').map(text => ({ text, type: 'output' as const }));
                     }
                 }
 
                 output = isTail ? inputLines.slice(-n) : inputLines.slice(0, n);
                 break;
             }
+
+            // ... (Other commands like ls, pwd, etc. usually don't need content fetch, just metadata)
+            // But we need to keep them here.
+            // I will copy the rest of the cases from the original file, they are safe to stay sync-like but wrapped in async.
 
             case 'ls': {
                 const showHidden = args.includes('-a') || args.includes('-la') || args.includes('-al');
@@ -186,7 +234,9 @@ export const useVFSShell = (options: VFSShellOptions) => {
                     if (!node) {
                         output = [{ text: `chmod: ${targetFile}: Tidak ada file`, type: 'error' }];
                     } else {
+                        // Reuse existing chmod logic
                         let newPerms = node.permissions || (node.type === 'directory' ? 'rwxr-xr-x' : 'rw-r--r--');
+                        // ... (same chmod logic)
                         if (/^[0-7]{3}$/.test(mode)) {
                             const octalToPerms = (n: number): string => {
                                 return (n & 4 ? 'r' : '-') + (n & 2 ? 'w' : '-') + (n & 1 ? 'x' : '-');
@@ -210,13 +260,14 @@ export const useVFSShell = (options: VFSShellOptions) => {
             }
 
             case 'ps': {
+                // SAME PS LOGIC
                 const showAll = args.includes('aux') || args.includes('-ef');
                 if (showAll) {
                     output = [
                         { text: 'USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND', type: 'output' },
                         { text: 'root         1  0.0  0.1  10240  2048 ?        Ss   09:00   0:00 /init', type: 'output' },
                         { text: 'www-data    42  0.0  0.5  45000  8192 ?        S    09:01   0:00 nginx', type: 'output' },
-                        { text: 'hacker     999  0.1  0.2  15000  4096 ?        S    09:05   0:01 hacker_service --key=yadika{ps_aux_grep}', type: 'output' },
+                        { text: 'hacker     999  0.1  0.2  15000  4096 ?        S    09:05   0:01 hacker_service --key=****', type: 'output' }, // REDACTED in logic too
                         { text: 'user      1002  0.0  0.1  12000  2048 ?        R    12:00   0:00 ps aux', type: 'output' }
                     ];
                 } else {
@@ -229,12 +280,11 @@ export const useVFSShell = (options: VFSShellOptions) => {
             }
 
             case 'env':
-            case 'printenv': {
+            case 'printenv':
                 output = Object.entries(env).map(([key, val]) => ({ text: `${key}=${val}`, type: 'output' as const }));
                 break;
-            }
 
-            case 'echo': {
+            case 'echo':
                 const text = args.map(arg => {
                     if (arg.startsWith('$')) {
                         const varName = arg.slice(1);
@@ -244,29 +294,25 @@ export const useVFSShell = (options: VFSShellOptions) => {
                 }).join(' ');
                 output = [{ text, type: 'output' }];
                 break;
-            }
 
-            case 'wc': {
-                const inputLines = pipeInput || [];
+            case 'wc':
+                const wcLines = pipeInput || [];
                 if (args[0] === '-l') {
-                    output = [{ text: `${inputLines.length}`, type: 'output' }];
+                    output = [{ text: `${wcLines.length}`, type: 'output' }];
                 } else {
-                    output = [{ text: `${inputLines.length} lines`, type: 'output' }];
+                    output = [{ text: `${wcLines.length} lines`, type: 'output' }];
                 }
                 break;
-            }
 
-            case 'sort': {
-                const inputLines = pipeInput || [];
-                output = [...inputLines].sort((a, b) => a.text.localeCompare(b.text));
+            case 'sort':
+                const sortLines = pipeInput || [];
+                output = [...sortLines].sort((a, b) => a.text.localeCompare(b.text));
                 break;
-            }
 
-            case 'uniq': {
-                const inputLines = pipeInput || [];
-                output = inputLines.filter((line, i, arr) => i === 0 || line.text !== arr[i - 1].text);
+            case 'uniq':
+                const uniqLines = pipeInput || [];
+                output = uniqLines.filter((line, i, arr) => i === 0 || line.text !== arr[i - 1].text);
                 break;
-            }
 
             case 'pwd':
                 output = [{ text: currentPath, type: 'output' }];
@@ -276,7 +322,8 @@ export const useVFSShell = (options: VFSShellOptions) => {
                 output = [{ text: user, type: 'output' }];
                 break;
 
-            case 'tree': {
+            case 'tree':
+                // Same tree logic
                 const targetPath = args[0] ? resolvePath(currentPath, args[0]) : currentPath;
                 const node = getNode(filesystem, targetPath);
                 if (!node || node.type !== 'directory') {
@@ -299,7 +346,6 @@ export const useVFSShell = (options: VFSShellOptions) => {
                     output = [{ text: '.', type: 'output' }, ...buildTree(node).map(text => ({ text, type: 'output' as const }))];
                 }
                 break;
-            }
 
             case 'help':
                 output = [
@@ -324,9 +370,9 @@ export const useVFSShell = (options: VFSShellOptions) => {
         }
 
         return output;
-    }, [currentPath, filesystem, onFlagFound, user]);
+    }, [currentPath, filesystem, onFlagFound, user, levelId, shell]); // Added levelId, shell
 
-    const executeCommand = useCallback((cmd: string) => {
+    const executeCommand = useCallback(async (cmd: string) => {
         const trimmed = cmd.trim();
         const prompt = `${user}@${hostname}:${currentPath}$ ${cmd}`;
         shell.addLines([{ text: prompt, type: 'input' }]);
@@ -338,7 +384,7 @@ export const useVFSShell = (options: VFSShellOptions) => {
             return;
         }
 
-        // Handle cd (updates state)
+        // Handle cd (updates state) - Sync for now
         if (trimmed.toLowerCase().startsWith('cd ') || trimmed.toLowerCase() === 'cd') {
             const target = trimmed.split(/\s+/)[1] || initialPath;
             const resolved = resolvePath(currentPath, target);
@@ -362,42 +408,45 @@ export const useVFSShell = (options: VFSShellOptions) => {
 
         // Handle Redirection or Pipeline or Single Command
         let result: TerminalLine[] = [];
-        if (trimmed.includes('>')) {
-            const [cmdText, targetFileText] = trimmed.split('>');
-            const targetFile = targetFileText.trim();
-            const sourceCmd = cmdText.trim();
+        try {
+            if (trimmed.includes('>')) {
+                const [cmdText, targetFileText] = trimmed.split('>');
+                const targetFile = targetFileText.trim();
+                const sourceCmd = cmdText.trim();
 
-            // Execute the source command
-            let cmdOutput: TerminalLine[] = [];
-            if (sourceCmd.includes('|')) {
-                const commands = sourceCmd.split('|').map(c => c.trim());
+                let cmdOutput: TerminalLine[] = [];
+                if (sourceCmd.includes('|')) {
+                    const commands = sourceCmd.split('|').map(c => c.trim());
+                    let currentPipeOutput: TerminalLine[] | undefined = undefined;
+                    for (const c of commands) {
+                        currentPipeOutput = await executeSingleCommand(c, currentPipeOutput);
+                    }
+                    cmdOutput = currentPipeOutput || [];
+                } else {
+                    cmdOutput = await executeSingleCommand(sourceCmd);
+                }
+
+                if (cmdOutput.some(l => l.type === 'error')) {
+                    result = cmdOutput;
+                } else {
+                    const content = cmdOutput.map(l => l.text).join('\n');
+                    const resolved = resolvePath(currentPath, targetFile);
+                    setFilesystem(prev => updateVFS(prev, resolved, (node) => ({ ...node, content, type: 'file' })));
+                    result = [];
+                }
+            } else if (trimmed.includes('|')) {
+                const commands = trimmed.split('|').map(c => c.trim());
                 let currentPipeOutput: TerminalLine[] | undefined = undefined;
                 for (const c of commands) {
-                    currentPipeOutput = executeSingleCommand(c, currentPipeOutput);
+                    currentPipeOutput = await executeSingleCommand(c, currentPipeOutput);
                 }
-                cmdOutput = currentPipeOutput || [];
+                result = currentPipeOutput || [];
             } else {
-                cmdOutput = executeSingleCommand(sourceCmd);
+                result = await executeSingleCommand(trimmed);
             }
-
-            // If command had error, don't redirect (optional, but realistic)
-            if (cmdOutput.some(l => l.type === 'error')) {
-                result = cmdOutput;
-            } else {
-                const content = cmdOutput.map(l => l.text).join('\n');
-                const resolved = resolvePath(currentPath, targetFile);
-                setFilesystem(prev => updateVFS(prev, resolved, (node) => ({ ...node, content, type: 'file' })));
-                result = []; // No output to terminal normally for redirection
-            }
-        } else if (trimmed.includes('|')) {
-            const commands = trimmed.split('|').map(c => c.trim());
-            let currentPipeOutput: TerminalLine[] | undefined = undefined;
-            for (const c of commands) {
-                currentPipeOutput = executeSingleCommand(c, currentPipeOutput);
-            }
-            result = currentPipeOutput || [];
-        } else {
-            result = executeSingleCommand(trimmed);
+        } catch (e) {
+            console.error(e);
+            result = [{ text: 'Error executing command', type: 'error' }];
         }
 
         if (result.length > 0) {
@@ -415,16 +464,16 @@ export const useVFSShell = (options: VFSShellOptions) => {
         }
     }, [user, hostname, currentPath, shell, customCommands, initialPath, filesystem, executeSingleCommand, onFlagFound]);
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         const input = shell.input;
         if (input.trim() || input === '') {
-            executeCommand(input);
+            shell.setInput(''); // Clear input immediately
+            await executeCommand(input);
             if (input.trim()) {
                 shell.setHistory(prev => [...prev, input.trim()]);
                 shell.setHistoryIndex(-1);
             }
-            shell.setInput('');
         }
     };
 

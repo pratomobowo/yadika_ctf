@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 
-export function useSubmitFlag(level: number, correctFlag: string) {
+export function useSubmitFlag(level: number) {
     const [status, setStatus] = useState<'idle' | 'submitting' | 'wrong' | 'correct'>('idle');
     const [error, setError] = useState<string | null>(null);
     const { refreshUser, isLevelCompleted } = useAuth();
@@ -11,16 +11,7 @@ export function useSubmitFlag(level: number, correctFlag: string) {
     const alreadyCompleted = isLevelCompleted(level);
 
     const submitFlag = async (flag: string): Promise<boolean> => {
-        // Quick client-side check first
-        if (flag.toLowerCase() !== correctFlag.toLowerCase()) {
-            setStatus('wrong');
-            setError('Flag salah!');
-            setTimeout(() => {
-                setStatus('idle');
-                setError(null);
-            }, 2000);
-            return false;
-        }
+        // No client-side check for security
 
         setStatus('submitting');
         setError(null);

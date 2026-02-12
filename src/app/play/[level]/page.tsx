@@ -19,8 +19,7 @@ export default function DynamicLevelPage({ params }: { params: Promise<{ level: 
     const [flagFound, setFlagFound] = useState(false);
     const [showHint, setShowHint] = useState(false);
     const { submitFlag, status, alreadyCompleted, setStatus } = useSubmitFlag(
-        levelNum,
-        levelData?.flag || ''
+        levelNum
     );
     const { user, loading, isLevelUnlocked } = useAuth();
     const router = useRouter();

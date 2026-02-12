@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getSession } from '@/lib/auth';
-import { getAllFlags, getLevelById } from '@/lib/ctfLevels';
+import { getAllFlags, getLevelById } from '@/lib/ctfLevels.server';
 
 // CTF Flags from central config
 const CTF_FLAGS = getAllFlags();
@@ -10,6 +10,8 @@ const CTF_FLAGS = getAllFlags();
 const MODULE_FLAGS: { [level: number]: string } = {
     // Modules use 1XXX, 2XXX, etc.
 };
+
+import { checkRateLimit } from '@/lib/rateLimit';
 
 export async function GET() {
     try {

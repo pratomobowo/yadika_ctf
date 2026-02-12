@@ -23,6 +23,7 @@ export const DynamicCTFTerminal: React.FC<DynamicCTFTerminalProps> = ({ level, o
         levelTitle: `Level ${level.id}: ${level.title}`,
         customCommands: level.customCommands,
         initialEnv: level.initialEnv,
+        levelId: level.id,
     });
 
     return (
