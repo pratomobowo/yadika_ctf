@@ -196,40 +196,42 @@ export default function DashboardPage() {
                         ) : leaderboard.length === 0 ? (
                             <div className="text-center py-6 text-foreground/30 font-mono text-xs">Belum ada data</div>
                         ) : (
-                            <div className="space-y-0.5">
-                                <div className="grid grid-cols-12 gap-2 px-2.5 py-1.5 text-[10px] text-foreground/30 font-mono uppercase tracking-wider">
-                                    <div className="col-span-1">#</div>
-                                    <div className="col-span-7">Discord Tag</div>
-                                    <div className="col-span-4 text-right">Poin</div>
+                            <div className="max-h-[300px] overflow-y-auto terminal-scrollbar pr-1">
+                                <div className="space-y-0.5">
+                                    <div className="grid grid-cols-12 gap-2 px-2.5 py-1.5 text-[10px] text-foreground/30 font-mono uppercase tracking-wider sticky top-0 bg-[#0d0d0f]/95 backdrop-blur-sm z-10">
+                                        <div className="col-span-1">#</div>
+                                        <div className="col-span-7">Discord Tag</div>
+                                        <div className="col-span-4 text-right">Poin</div>
+                                    </div>
+                                    {leaderboard.map((entry) => {
+                                        const isMe = entry.discord === user.discord;
+                                        return (
+                                            <div key={entry.discord}
+                                                className={`grid grid-cols-12 gap-2 px-2.5 py-2 rounded-md items-center transition-colors ${isMe ? 'bg-primary/10 border border-primary/20' : 'hover:bg-white/[0.03]'
+                                                    }`}>
+                                                <div className="col-span-1">
+                                                    {entry.rank <= 3 ? (
+                                                        <Medal size={14} className={
+                                                            entry.rank === 1 ? 'text-amber-400'
+                                                                : entry.rank === 2 ? 'text-gray-300'
+                                                                    : 'text-amber-700'
+                                                        } />
+                                                    ) : (
+                                                        <span className="text-[10px] text-foreground/40 font-mono">{entry.rank}</span>
+                                                    )}
+                                                </div>
+                                                <div className="col-span-7 truncate">
+                                                    <span className={`text-xs font-mono translate-y-[-1px] ${isMe ? 'text-primary font-bold' : 'text-foreground/80'}`}>
+                                                        @{entry.discord}
+                                                    </span>
+                                                </div>
+                                                <div className="col-span-4 text-right">
+                                                    <span className="text-xs font-mono font-bold text-amber-400">{entry.points}</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                                {leaderboard.map((entry) => {
-                                    const isMe = entry.discord === user.discord;
-                                    return (
-                                        <div key={entry.discord}
-                                            className={`grid grid-cols-12 gap-2 px-2.5 py-2 rounded-md items-center transition-colors ${isMe ? 'bg-primary/10 border border-primary/20' : 'hover:bg-white/[0.03]'
-                                                }`}>
-                                            <div className="col-span-1">
-                                                {entry.rank <= 3 ? (
-                                                    <Medal size={14} className={
-                                                        entry.rank === 1 ? 'text-amber-400'
-                                                            : entry.rank === 2 ? 'text-gray-300'
-                                                                : 'text-amber-700'
-                                                    } />
-                                                ) : (
-                                                    <span className="text-[10px] text-foreground/40 font-mono">{entry.rank}</span>
-                                                )}
-                                            </div>
-                                            <div className="col-span-7 truncate">
-                                                <span className={`text-xs font-mono translate-y-[-1px] ${isMe ? 'text-primary font-bold' : 'text-foreground/80'}`}>
-                                                    @{entry.discord}
-                                                </span>
-                                            </div>
-                                            <div className="col-span-4 text-right">
-                                                <span className="text-xs font-mono font-bold text-amber-400">{entry.points}</span>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
                             </div>
                         )}
                     </motion.div>
