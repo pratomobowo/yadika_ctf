@@ -204,6 +204,20 @@ export const ctfLevelData: CTFLevel[] = [
                     }
                 }
             }
+        },
+        customCommands: (cmd, args, _cp, addLines) => {
+            if (cmd === 'ps' && (args.includes('aux') || args.includes('-ef'))) {
+                addLines([
+                    { text: 'USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND', type: 'output' },
+                    { text: 'root         1  0.0  0.1  10240  2048 ?        Ss   09:00   0:00 /init', type: 'output' },
+                    { text: 'www-data    42  0.0  0.5  45000  8192 ?        S    09:01   0:00 nginx', type: 'output' },
+                    { text: 'hacker     999  0.1  0.2  15000  4096 ?        S    09:05   0:01 hacker_service --key=yadika{ps_aux_grep}', type: 'output' },
+                    { text: 'user      1002  0.0  0.1  12000  2048 ?        R    12:00   0:00 ps aux', type: 'output' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
+            }
+            return false;
         }
     },
     {
@@ -286,7 +300,10 @@ export const ctfLevelData: CTFLevel[] = [
             }
         },
         customCommands: (cmd, args, _cp, addLines) => {
-            if (cmd === './get_flag.sh') {
+            const isScriptExec = cmd === './get_flag.sh' ||
+                ((cmd === 'sh' || cmd === 'bash') && args[0] === 'get_flag.sh');
+
+            if (isScriptExec) {
                 addLines([
                     { text: 'Running script...', type: 'output' },
                     { text: 'Flag: yadika{bash_script_hero}', type: 'success' },

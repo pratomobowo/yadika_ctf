@@ -351,6 +351,32 @@ export const useVFSShell = (options: VFSShellOptions) => {
                 }
                 break;
 
+            case 'find': {
+                const targetPath = args.find(a => !a.startsWith('-')) || '.';
+                const namePattern = args.includes('-name') ? args[args.indexOf('-name') + 1]?.replace(/['"]/g, '') : null;
+                const resolved = resolvePath(currentPath, targetPath);
+                const node = getNode(filesystem, resolved);
+
+                if (!node) {
+                    output = [{ text: `find: ${targetPath}: Tidak ada file atau direktori`, type: 'error' }];
+                } else {
+                    const found: string[] = [];
+                    const search = (n: FileNode, currentRelPath: string) => {
+                        if (!namePattern || currentRelPath.split('/').pop()?.includes(namePattern)) {
+                            found.push(currentRelPath);
+                        }
+                        if (n.type === 'directory' && n.children) {
+                            Object.entries(n.children).forEach(([name, child]) => {
+                                search(child, (currentRelPath === '.' ? '' : currentRelPath + '/') + name);
+                            });
+                        }
+                    };
+                    search(node, targetPath === '/' ? '/' : '.');
+                    output = found.map(text => ({ text, type: 'output' as const }));
+                }
+                break;
+            }
+
             case 'help':
                 output = [
                     { text: 'Perintah yang tersedia:', type: 'output' },
