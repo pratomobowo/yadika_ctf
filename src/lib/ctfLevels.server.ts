@@ -779,11 +779,24 @@ export const ctfLevelData: CTFLevel[] = [
     {
         id: 30, title: 'Reverse Shell 101', flag: 'yadika{r3v_sh3ll_101}', points: 30, hint: 'Siapkan listener untuk menerima flag.', ...STAGE3,
         filesystem: {
-            type: 'directory', children: { 'home': { type: 'directory', children: { 'guest': { type: 'directory', children: { 'send_data.sh': { type: 'file', content: '#!/bin/bash\n# Script ini akan mengirim data ke port 4444\nnc localhost 4444' }, 'readme.txt': { type: 'file', content: 'Sebuah script (send_data.sh) akan mengirim flag ke port local 4444.\nSiapkan listener di terminal ini untuk menangkap datanya!\nPerintah: nc -lvp 4444 lalu jalankan script di tab lain (simulasi: ketik nc -lvp 4444 saja)' } } } } } }
+            type: 'directory', children: {
+                'home': {
+                    type: 'directory', children: {
+                        'guest': {
+                            type: 'directory', children: {
+                                'send_data.sh': { type: 'file', content: '#!/bin/bash\n# Script ini akan mengirim data ke port 4444\n# Payload: nc localhost 4444 < /tmp/secret_flag.txt\n# Catatan: script berjalan otomatis di background' },
+                                'readme.txt': { type: 'file', content: 'Sebuah script otomatis mengirim data rahasia ke port 4444 di localhost.\nTugas kamu: tangkap data tersebut sebelum hilang!\nPetunjuk: gunakan network utility (nc) untuk membuka listener di port yang tepat.' }
+                            }
+                        }
+                    }
+                }
+            }
         },
         customCommands: (cmd, args, _cp, addLines) => {
-            if (cmd === 'nc') {
-                if (args.includes('-l') && (args.includes('4444') || args.includes('-p'))) {
+            if (cmd === 'nc' || cmd === 'netcat' || cmd === 'ncat') {
+                const hasListen = args.includes('-l') || args.includes('-lvp') || args.includes('-lnvp') || args.includes('-lp');
+                const hasPort = args.includes('4444');
+                if (hasListen && hasPort) {
                     addLines([
                         { text: 'Listening on [0.0.0.0] (family 0, port 4444)', type: 'output' },
                         { text: 'Connection from 127.0.0.1 received!', type: 'success' },
@@ -792,6 +805,12 @@ export const ctfLevelData: CTFLevel[] = [
                     ]);
                     return true;
                 }
+                // Give a helpful nudge if they use nc but wrong flags
+                addLines([
+                    { text: 'nc: coba buka listener mode (-l) di port 4444', type: 'error' },
+                    { text: '', type: 'output' }
+                ]);
+                return true;
             }
             return false;
         }
