@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { User, Shield, CheckCircle2, Circle, Lock, KeyRound, ArrowLeft, Eye, EyeOff, Terminal, ShieldCheck, Globe, Package, Cpu, Zap, Wand, Award } from 'lucide-react';
 import Link from 'next/link';
 import { SessionLayout } from '@/components/layouts/SessionLayout';
+import SkillRadar from '@/components/SkillRadar';
 
 const levels = [
     { id: 1, title: 'Welcome to the Shell', skill: 'Navigasi Filesystem' },
@@ -17,7 +18,7 @@ const levels = [
 ];
 
 export default function ProfilePage() {
-    const { user, loading, isLevelCompleted, isLevelUnlocked, refreshUser } = useAuth();
+    const { user, loading, skillStats, isLevelCompleted, isLevelUnlocked, refreshUser } = useAuth();
     const router = useRouter();
 
     const [editFullName, setEditFullName] = useState('');
@@ -138,36 +139,49 @@ export default function ProfilePage() {
     return (
         <SessionLayout title="User Profile" currentLevel={0} showObjectives={false}>
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 md:space-y-6">
-                {/* User Info Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6"
-                >
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary border-2 border-primary/30 shrink-0">
-                            <User size={24} className="md:w-8 md:h-8" />
+                <div className="grid lg:grid-cols-3 gap-4 md:gap-6">
+                    {/* User Info Card */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="lg:col-span-2 bg-white/5 border border-white/10 rounded-xl p-4 md:p-6 flex flex-col justify-center"
+                    >
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary border-2 border-primary/30 shrink-0">
+                                <User size={24} className="md:w-8 md:h-8" />
+                            </div>
+                            <div className="min-w-0">
+                                <h1 className="text-lg md:text-xl font-bold text-foreground truncate">{user.fullName}</h1>
+                                <p className="text-primary/60 font-mono text-[10px] md:text-sm truncate">@{user.discord}</p>
+                            </div>
                         </div>
-                        <div className="min-w-0">
-                            <h1 className="text-lg md:text-xl font-bold text-foreground truncate">{user.fullName}</h1>
-                            <p className="text-primary/60 font-mono text-[10px] md:text-sm truncate">@{user.discord}</p>
-                        </div>
-                    </div>
 
-                    {/* Progress Bar */}
-                    <div className="mb-2 flex items-center justify-between text-[10px] md:text-sm">
-                        <span className="text-foreground/60 font-mono uppercase tracking-wider">Progress Keseluruhan</span>
-                        <span className="text-primary font-mono font-bold">{completedCount}/{totalLevels} ({progressPercent}%)</span>
-                    </div>
-                    <div className="w-full h-2.5 md:h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progressPercent}%` }}
-                            transition={{ duration: 1, ease: 'easeOut' }}
-                            className="h-full bg-gradient-to-r from-primary/80 to-secondary rounded-full"
-                        />
-                    </div>
-                </motion.div>
+                        {/* Progress Bar */}
+                        <div className="mb-2 flex items-center justify-between text-[10px] md:text-sm">
+                            <span className="text-foreground/60 font-mono uppercase tracking-wider">Progress Keseluruhan</span>
+                            <span className="text-primary font-mono font-bold">{completedCount}/{totalLevels} ({progressPercent}%)</span>
+                        </div>
+                        <div className="w-full h-2.5 md:h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progressPercent}%` }}
+                                transition={{ duration: 1, ease: 'easeOut' }}
+                                className="h-full bg-gradient-to-r from-primary/80 to-secondary rounded-full"
+                            />
+                        </div>
+                    </motion.div>
+
+                    {/* Skill Radar Chart */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col items-center justify-center min-h-[300px]"
+                    >
+                        <h3 className="text-[10px] font-mono uppercase tracking-widest text-foreground/40 mb-2">Visualisasi Kompetensi</h3>
+                        <SkillRadar data={skillStats} />
+                    </motion.div>
+                </div>
 
                 {/* Badge Case */}
                 <motion.div

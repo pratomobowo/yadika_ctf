@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { ctfLevelData } from '@/lib/ctfLevels';
 
 interface Progress {
     level: number;
@@ -29,9 +30,16 @@ interface User {
     badges: UserBadge[];
 }
 
+interface SkillStat {
+    subject: string;
+    A: number; // User score
+    fullMark: number;
+}
+
 interface AuthContextType {
     user: User | null;
     loading: boolean;
+    skillStats: SkillStat[];
     login: (discord: string, password: string) => Promise<{ success: boolean; error?: string }>;
     register: (fullName: string, discord: string, password: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => Promise<void>;
@@ -129,6 +137,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return user?.progress.some(p => p.level === level) || false;
     }, [user]);
 
+    const skillStats = useMemo(() => {
+        const categories = ['Linux CLI', 'Scripting', 'Networking', 'DevOps', 'Security'];
+        const stats = categories.map(cat => {
+            const levelsInCategory = ctfLevelData.filter(l => l.category === cat);
+            const completedInCategory = user?.progress.filter(p =>
+                levelsInCategory.some(l => l.id === p.level)
+            ) || [];
+
+            return {
+                subject: cat,
+                A: completedInCategory.length,
+                fullMark: levelsInCategory.length || 10 // default 10 if none found
+            };
+        });
+        return stats;
+    }, [user]);
+
     const isLevelUnlocked = useCallback((level: number) => {
         // Admins have everything unlocked
         if (user?.role === 'ADMIN') return true;
@@ -147,7 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [user, isLevelCompleted]);
 
     return (
-        <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser, isLevelCompleted, isLevelUnlocked, updateProgress }}>
+        <AuthContext.Provider value={{ user, loading, skillStats, login, register, logout, refreshUser, isLevelCompleted, isLevelUnlocked, updateProgress }}>
             {children}
         </AuthContext.Provider>
     );
