@@ -1,5 +1,6 @@
 
 import { prisma } from './db';
+import { logActivity } from './activityLogger';
 
 export async function checkAndAwardBadges(userId: string): Promise<string[]> {
     console.log(`Checking badges for user: ${userId}`);
@@ -91,6 +92,8 @@ export async function checkAndAwardBadges(userId: string): Promise<string[]> {
                     }
                 });
                 awardedBadges.push(badge.name);
+                // Log badge earned activity
+                await logActivity(userId, 'BADGE_EARNED', `mendapatkan badge "${badge.name}"!`, badge.icon || 'Award');
             } catch (e) {
                 // Parallel attempts might cause unique constraint failure, ignore
                 console.error(`Error awarding badge ${badge.name}:`, e);

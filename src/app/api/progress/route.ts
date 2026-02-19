@@ -13,6 +13,7 @@ const MODULE_FLAGS: { [level: number]: string } = {
 
 import { checkRateLimit } from '@/lib/rateLimit';
 import { checkAndAwardBadges } from '@/lib/badgeUtils';
+import { logActivity } from '@/lib/activityLogger';
 
 export async function GET() {
     try {
@@ -113,6 +114,9 @@ export async function POST(request: NextRequest) {
 
         // Check for new badges
         const newBadges = await checkAndAwardBadges(session.id);
+
+        // Log activity
+        await logActivity(session.id, 'LEVEL_COMPLETE', `memecahkan Level ${level}: ${levelData.title}!`, 'Flag');
 
         return NextResponse.json({
             success: true,

@@ -18,6 +18,7 @@ model User {
   progress  Progress[]
   quizAttempts QuizAttempt[]
   badges    UserBadge[]
+  activities ActivityLog[]
 }
 
 model Progress {
@@ -70,4 +71,16 @@ model UserBadge {
   badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
 
   @@unique([userId, badgeId])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // LEVEL_COMPLETE | BADGE_EARNED | QUIZ_CORRECT | REGISTER
+  message   String   // e.g. "memecahkan Level 30!"
+  icon      String   // Lucide icon name
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt(sort: Desc)])
 }

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { ctfLevelData } from '@/lib/ctfLevels';
 import DailyQuizCard from '@/components/DailyQuizCard';
+import ActivityFeed from '@/components/ActivityFeed';
 
 const sessionModules = [
     { level: 1001, title: 'Instalasi Ubuntu Server', href: '/play/session/1' },
@@ -155,8 +156,13 @@ export default function DashboardPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                     {/* Daily Quiz */}
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
-                        className="md:col-span-2 h-full">
+                        className="h-full">
                         <DailyQuizCard />
+                    </motion.div>
+                    {/* Live Activity Feed */}
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 }}
+                        className="h-full">
+                        <ActivityFeed />
                     </motion.div>
                     {/* Module Progress */}
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}

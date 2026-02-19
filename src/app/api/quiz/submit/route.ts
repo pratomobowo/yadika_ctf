@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { checkAndAwardBadges } from '@/lib/badgeUtils';
+import { logActivity } from '@/lib/activityLogger';
 
 export async function POST(request: NextRequest) {
     const session = await getSession();
@@ -76,6 +77,11 @@ export async function POST(request: NextRequest) {
 
         // Check for new badges
         const newBadges = await checkAndAwardBadges(session.id);
+
+        // Log activity
+        if (isCorrect) {
+            await logActivity(session.id, 'QUIZ_CORRECT', 'menjawab kuis harian dengan benar!', 'HelpCircle');
+        }
 
         return NextResponse.json({
             success: true,
