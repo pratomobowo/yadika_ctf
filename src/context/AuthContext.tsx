@@ -7,6 +7,18 @@ interface Progress {
     completedAt: string;
 }
 
+interface Badge {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+}
+
+interface UserBadge {
+    badge: Badge;
+    awardedAt: string;
+}
+
 interface User {
     id: string;
     fullName: string;
@@ -14,6 +26,7 @@ interface User {
     role: string;
     points: number;
     progress: Progress[];
+    badges: UserBadge[];
 }
 
 interface AuthContextType {

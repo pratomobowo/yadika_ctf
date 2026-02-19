@@ -6,8 +6,10 @@ import { SessionLayout } from '@/components/layouts/SessionLayout';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
-    Trophy, Star, Target, ArrowRight,
-    CheckCircle2, Circle, Lock, Zap, Medal, BookOpen, Terminal, Shield
+    Terminal, Shield, CheckCircle2, Trophy, Clock, Target,
+    Gamepad2, Info, ChevronRight, LayoutDashboard, Flag,
+    User, Settings, Menu, X, Rocket, ShieldCheck, Globe,
+    Package, Cpu, Zap, Wand, Award, Star, BookOpen, ArrowRight, Circle, Lock, Medal
 } from 'lucide-react';
 import { ctfLevelData } from '@/lib/ctfLevels';
 import DailyQuizCard from '@/components/DailyQuizCard';
@@ -31,6 +33,8 @@ interface LeaderboardEntry {
     discord: string;
     points: number;
     completedCount: number;
+    lastActive: string | null;
+    badgeIcons: string[];
 }
 
 export default function DashboardPage() {
@@ -226,10 +230,28 @@ export default function DashboardPage() {
                                                         <span className="text-[10px] text-foreground/40 font-mono">{entry.rank}</span>
                                                     )}
                                                 </div>
-                                                <div className="col-span-7 truncate">
-                                                    <span className={`text-xs font-mono translate-y-[-1px] ${isMe ? 'text-primary font-bold' : 'text-foreground/80'}`}>
-                                                        @{entry.discord}
-                                                    </span>
+                                                <div className="col-span-7 flex items-center gap-2 min-w-0">
+                                                    <p className={`text-xs font-mono truncate ${isMe ? 'text-primary font-bold' : 'text-foreground/80'}`}>
+                                                        {entry.discord}
+                                                    </p>
+                                                    {/* Badge Icons */}
+                                                    <div className="flex items-center gap-1 shrink-0">
+                                                        {(entry.badgeIcons || []).slice(0, 3).map((iconName, idx) => {
+                                                            const IconComponent = {
+                                                                'Terminal': Terminal,
+                                                                'ShieldCheck': ShieldCheck,
+                                                                'Globe': Globe,
+                                                                'Package': Package,
+                                                                'Cpu': Cpu,
+                                                                'Zap': Zap,
+                                                                'Wand': Wand
+                                                            }[iconName] || Award;
+                                                            return <IconComponent key={idx} size={12} className="text-secondary/60" />;
+                                                        })}
+                                                        {entry.badgeIcons?.length > 3 && (
+                                                            <span className="text-[8px] text-foreground/30">+{entry.badgeIcons.length - 3}</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <div className="col-span-4 text-right">
                                                     <span className="text-xs font-mono font-bold text-amber-400">{entry.points}</span>

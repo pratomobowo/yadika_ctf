@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { User, Shield, CheckCircle2, Circle, Lock, KeyRound, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { User, Shield, CheckCircle2, Circle, Lock, KeyRound, ArrowLeft, Eye, EyeOff, Terminal, ShieldCheck, Globe, Package, Cpu, Zap, Wand, Award } from 'lucide-react';
 import Link from 'next/link';
 import { SessionLayout } from '@/components/layouts/SessionLayout';
 
@@ -166,6 +166,60 @@ export default function ProfilePage() {
                             transition={{ duration: 1, ease: 'easeOut' }}
                             className="h-full bg-gradient-to-r from-primary/80 to-secondary rounded-full"
                         />
+                    </div>
+                </motion.div>
+
+                {/* Badge Case */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                    className="bg-white/5 border border-white/10 rounded-xl p-4 md:p-6"
+                >
+                    <div className="flex items-center gap-2 mb-6">
+                        <Award size={18} className="text-secondary" />
+                        <h2 className="text-sm md:text-lg font-bold font-mono uppercase tracking-tight">Badge Case</h2>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+                        {(user.badges || []).map((ub, idx) => {
+                            const IconComponent = {
+                                'Terminal': Terminal,
+                                'ShieldCheck': ShieldCheck,
+                                'Globe': Globe,
+                                'Package': Package,
+                                'Cpu': Cpu,
+                                'Zap': Zap,
+                                'Wand': Wand
+                            }[ub.badge.icon] || Award;
+
+                            return (
+                                <motion.div
+                                    key={ub.badge.id}
+                                    initial={{ scale: 0.8, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    className="group relative flex flex-col items-center p-3 rounded-xl bg-secondary/10 border border-secondary/20 hover:bg-secondary/20 transition-all cursor-default"
+                                >
+                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-secondary/20 flex items-center justify-center text-secondary mb-2 group-hover:scale-110 transition-transform">
+                                        <IconComponent size={24} />
+                                    </div>
+                                    <span className="text-[10px] md:text-xs font-bold font-mono text-center text-foreground line-clamp-1">{ub.badge.name}</span>
+
+                                    {/* Tooltip */}
+                                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-black border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-[10px] md:text-xs text-center">
+                                        <p className="font-bold text-secondary mb-1">{ub.badge.name}</p>
+                                        <p className="text-foreground/60">{ub.badge.description}</p>
+                                        <p className="text-[8px] mt-1 text-foreground/30 italic">Awarded: {new Date(ub.awardedAt).toLocaleDateString()}</p>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                        {(!user.badges || user.badges.length === 0) && (
+                            <div className="col-span-full py-8 text-center border-2 border-dashed border-white/5 rounded-xl">
+                                <p className="text-xs md:text-sm text-foreground/20 font-mono">Belum ada badge yang dikumpulkan. Selesaikan level untuk mendapatkan badge!</p>
+                            </div>
+                        )}
                     </div>
                 </motion.div>
 

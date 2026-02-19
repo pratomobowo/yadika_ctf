@@ -17,6 +17,7 @@ model User {
   createdAt DateTime   @default(now())
   progress  Progress[]
   quizAttempts QuizAttempt[]
+  badges    UserBadge[]
 }
 
 model Progress {
@@ -48,4 +49,25 @@ model QuizAttempt {
   attemptedAt DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  icon        String   // Nama icon (Lucide)
+  criteria    String   // JSON string defining criteria (e.g. { "type": "level", "threshold": 10 })
+  users       UserBadge[]
+  createdAt   DateTime @default(now())
+}
+
+model UserBadge {
+  id        String   @id @default(cuid())
+  userId    String
+  badgeId   String
+  awardedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
 }

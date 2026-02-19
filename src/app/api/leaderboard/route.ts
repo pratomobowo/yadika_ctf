@@ -17,6 +17,13 @@ export async function GET() {
                 _count: {
                     select: { progress: true },
                 },
+                badges: {
+                    select: {
+                        badge: {
+                            select: { icon: true }
+                        }
+                    }
+                }
             },
             orderBy: { points: 'desc' },
             take: 20,
@@ -28,6 +35,7 @@ export async function GET() {
             points: u.points,
             completedCount: u._count.progress,
             lastActive: u.progress[0]?.completedAt || null,
+            badgeIcons: u.badges.map((ub: any) => ub.badge.icon),
         }));
 
         return NextResponse.json({ leaderboard });

@@ -28,6 +28,19 @@ export async function GET() {
                     },
                     orderBy: { level: 'asc' },
                 },
+                badges: {
+                    select: {
+                        awardedAt: true,
+                        badge: {
+                            select: {
+                                id: true,
+                                name: true,
+                                description: true,
+                                icon: true,
+                            }
+                        }
+                    }
+                }
             },
         });
 

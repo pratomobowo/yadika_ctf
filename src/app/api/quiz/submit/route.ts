@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { checkAndAwardBadges } from '@/lib/badgeUtils';
 
 export async function POST(request: NextRequest) {
     const session = await getSession();
@@ -73,12 +74,16 @@ export async function POST(request: NextRequest) {
             return { attempt, newPoints };
         });
 
+        // Check for new badges
+        const newBadges = await checkAndAwardBadges(session.id);
+
         return NextResponse.json({
             success: true,
             isCorrect,
             pointsAwarded: isCorrect ? quiz.points : 0,
             newTotalPoints: result.newPoints,
-            correctAnswer: isCorrect ? undefined : quiz.correctAnswer
+            correctAnswer: isCorrect ? undefined : quiz.correctAnswer,
+            newBadges: newBadges.length > 0 ? newBadges : undefined
         });
 
     } catch (error) {

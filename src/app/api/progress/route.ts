@@ -12,6 +12,7 @@ const MODULE_FLAGS: { [level: number]: string } = {
 };
 
 import { checkRateLimit } from '@/lib/rateLimit';
+import { checkAndAwardBadges } from '@/lib/badgeUtils';
 
 export async function GET() {
     try {
@@ -110,11 +111,15 @@ export async function POST(request: NextRequest) {
             data: { points: { increment: pointsToAward } },
         });
 
+        // Check for new badges
+        const newBadges = await checkAndAwardBadges(session.id);
+
         return NextResponse.json({
             success: true,
             correct: true,
             message: 'Selamat! Flag benar!',
             pointsAwarded: pointsToAward,
+            newBadges: newBadges.length > 0 ? newBadges : undefined
         });
     } catch (error) {
         console.error('Submit progress error:', error);
