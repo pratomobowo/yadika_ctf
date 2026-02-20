@@ -115,6 +115,13 @@ export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
                             <span className="text-xs font-bold font-mono tracking-wider uppercase">Dashboard</span>
                         </Link>
 
+                        <Link href="/clan"
+                            className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all group"
+                        >
+                            <Shield size={16} />
+                            <span className="text-xs font-bold font-mono tracking-wider uppercase">Squad</span>
+                        </Link>
+
                         {user?.role === 'ADMIN' && (
                             <Link href="/admin"
                                 className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[#E95420]/10 border border-[#E95420]/20 text-[#E95420] hover:bg-[#E95420]/20 transition-all group"

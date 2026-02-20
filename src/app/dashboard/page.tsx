@@ -47,6 +47,7 @@ interface LeaderboardEntry {
     completedCount: number;
     lastActive: string | null;
     badgeIcons: string[];
+    clanTag: string | null;
 }
 
 export default function DashboardPage() {
@@ -285,6 +286,7 @@ export default function DashboardPage() {
                                                 </div>
                                                 <div className="col-span-7 flex items-center gap-2 min-w-0">
                                                     <p className={`text-xs font-mono truncate ${isMe ? 'text-primary font-bold' : 'text-foreground/80'}`}>
+                                                        {entry.clanTag && <span className="text-blue-400/60 mr-1">[{entry.clanTag}]</span>}
                                                         {entry.discord}
                                                     </p>
                                                     {/* Badge Icons */}

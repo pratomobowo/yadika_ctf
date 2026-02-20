@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Users, Search, Filter, MoreVertical, Edit2,
     Trash2, RotateCcw, Shield, CheckCircle2,
-    Clock, Medal, X, Save, AlertTriangle, Download, Brain
+    Clock, Medal, X, Save, AlertTriangle, Download, Brain, KeyRound
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -26,6 +26,9 @@ export default function UserManagementPage() {
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+    const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
+    const [newPassword, setNewPassword] = useState('');
+    const [resetMessage, setResetMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -107,6 +110,31 @@ export default function UserManagementPage() {
             setActionLoading(null);
         }
     };
+    const handleResetPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!resetPasswordUser || !newPassword) return;
+        setActionLoading('resetting-pw');
+        setResetMessage(null);
+        try {
+            const res = await fetch('/api/admin/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: resetPasswordUser.id, newPassword }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setResetMessage({ type: 'success', text: data.message });
+                setNewPassword('');
+            } else {
+                setResetMessage({ type: 'error', text: data.error });
+            }
+        } catch {
+            setResetMessage({ type: 'error', text: 'Gagal reset password' });
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
     const handleExport = async () => {
         setActionLoading('exporting');
         try {
@@ -260,6 +288,13 @@ export default function UserManagementPage() {
                                                 className="p-1.5 hover:text-white transition-colors"
                                             >
                                                 <Edit2 size={14} />
+                                            </button>
+                                            <button
+                                                onClick={() => { setResetPasswordUser(u); setNewPassword(''); setResetMessage(null); }}
+                                                className="p-1.5 hover:text-cyan-400 transition-colors"
+                                                title="Reset Password"
+                                            >
+                                                <KeyRound size={14} />
                                             </button>
                                             <button
                                                 onClick={() => handleResetProgress(u.id)}
@@ -428,6 +463,60 @@ export default function UserManagementPage() {
                                     Delete User
                                 </button>
                             </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Reset Password Modal */}
+            <AnimatePresence>
+                {resetPasswordUser && (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                            onClick={() => setResetPasswordUser(null)}
+                        />
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                            className="relative w-full max-w-sm bg-[#0d0d0f] border border-cyan-500/20 rounded-xl p-6 shadow-2xl"
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-sm font-black font-mono uppercase tracking-widest text-cyan-400">Reset Password</h2>
+                                <button onClick={() => setResetPasswordUser(null)} className="text-foreground/40 hover:text-white"><X size={20} /></button>
+                            </div>
+
+                            <p className="text-[11px] font-mono text-foreground/40 mb-4">
+                                Reset password untuk <span className="text-white font-bold">{resetPasswordUser.fullName}</span> <span className="text-cyan-400">@{resetPasswordUser.discord}</span>
+                            </p>
+
+                            {resetMessage && (
+                                <div className={`mb-4 p-2.5 rounded-lg border text-[11px] font-mono ${resetMessage.type === 'success' ? 'bg-green-500/10 border-green-500/20 text-green-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}>
+                                    {resetMessage.text}
+                                </div>
+                            )}
+
+                            <form onSubmit={handleResetPassword} className="space-y-4">
+                                <div>
+                                    <label className="block text-[9px] font-mono text-foreground/40 uppercase mb-1">Password Baru</label>
+                                    <input
+                                        type="text"
+                                        value={newPassword}
+                                        onChange={e => setNewPassword(e.target.value)}
+                                        placeholder="Masukkan password baru"
+                                        className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:border-cyan-500/40"
+                                        autoFocus
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={actionLoading === 'resetting-pw' || newPassword.length < 4}
+                                    className="w-full py-3 bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 font-mono text-[11px] font-black uppercase rounded-lg hover:bg-cyan-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-40"
+                                >
+                                    <KeyRound size={14} />
+                                    {actionLoading === 'resetting-pw' ? 'RESETTING...' : 'RESET PASSWORD'}
+                                </button>
+                            </form>
                         </motion.div>
                     </div>
                 )}

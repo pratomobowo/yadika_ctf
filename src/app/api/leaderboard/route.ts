@@ -23,6 +23,9 @@ export async function GET() {
                             select: { icon: true }
                         }
                     }
+                },
+                clan: {
+                    select: { tag: true }
                 }
             },
             orderBy: { points: 'desc' },
@@ -36,9 +39,38 @@ export async function GET() {
             completedCount: u._count.progress,
             lastActive: u.progress[0]?.completedAt || null,
             badgeIcons: u.badges.map((ub: any) => ub.badge.icon),
+            clanTag: u.clan?.tag || null,
         }));
 
-        return NextResponse.json({ leaderboard });
+        // Clan leaderboard
+        const clans = await (prisma.clan as any).findMany({
+            include: {
+                members: {
+                    select: { points: true },
+                },
+                leader: {
+                    select: { discord: true },
+                },
+                _count: {
+                    select: { members: true },
+                },
+            },
+        });
+
+        const clanLeaderboard = clans
+            .map((c: any) => ({
+                name: c.name,
+                tag: c.tag,
+                totalPoints: c.members.reduce((sum: number, m: any) => sum + m.points, 0),
+                memberCount: c._count.members,
+                maxMembers: c.maxMembers,
+                leaderName: c.leader.discord,
+            }))
+            .sort((a: any, b: any) => b.totalPoints - a.totalPoints)
+            .slice(0, 10)
+            .map((c: any, i: number) => ({ ...c, rank: i + 1 }));
+
+        return NextResponse.json({ leaderboard, clanLeaderboard });
     } catch (error) {
         console.error('Leaderboard error:', error);
         return NextResponse.json({ error: 'Failed to get leaderboard' }, { status: 500 });

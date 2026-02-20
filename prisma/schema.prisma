@@ -19,6 +19,11 @@ model User {
   quizAttempts QuizAttempt[]
   badges    UserBadge[]
   activities ActivityLog[]
+
+  // Clan relations
+  clanId    String?
+  clan      Clan?      @relation("ClanMembers", fields: [clanId], references: [id])
+  ownedClan Clan?      @relation("ClanLeader")
 }
 
 model Progress {
@@ -83,4 +88,17 @@ model ActivityLog {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([createdAt(sort: Desc)])
+}
+
+model Clan {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  tag         String   @unique          // 3-4 char uppercase, e.g. "YDK"
+  inviteCode  String   @unique          // 6-char alphanumeric, e.g. "YDK-A8F9"
+  maxMembers  Int      @default(5)
+  createdAt   DateTime @default(now())
+
+  leaderId    String   @unique
+  leader      User     @relation("ClanLeader", fields: [leaderId], references: [id])
+  members     User[]   @relation("ClanMembers")
 }

@@ -40,7 +40,15 @@ export async function GET() {
                             }
                         }
                     }
-                }
+                },
+                clan: {
+                    select: {
+                        id: true,
+                        name: true,
+                        tag: true,
+                        leaderId: true,
+                    }
+                },
             },
         });
 
