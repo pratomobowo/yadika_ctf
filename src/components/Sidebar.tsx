@@ -56,7 +56,7 @@ const ctfLevels = ctfLevelData.map(l => ({ id: l.id, title: l.title }));
 export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
     const { user, isLevelCompleted, isLevelUnlocked, logout } = useAuth();
     const [isSessionsOpen, setIsSessionsOpen] = useState(true);
-    const [isEasyOpen, setIsEasyOpen] = useState(true);
+    const [isEasyOpen, setIsEasyOpen] = useState(false);
     const [isNormalOpen, setIsNormalOpen] = useState(false);
     const [isHardOpen, setIsHardOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -175,6 +175,12 @@ export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
                                     {[
                                         { id: 1004, title: '4. Text Editing & Manipulation', path: '/play/session/4' },
                                         { id: 1005, title: '5. User & Permission Mgmt', path: '/play/session/5' },
+                                        { id: 1006, title: '6. Web Server Apache', path: '/play/session/6' },
+                                        { id: 1007, title: '7. Nginx Web Server', path: '/play/session/7' },
+                                        { id: 1008, title: '8. Setup MySQL', path: '/play/session/8' },
+                                        { id: 1009, title: '9. phpMyAdmin Setup', path: '/play/session/9' },
+                                        { id: 1010, title: '10. Apache VirtualHost', path: '/play/session/10' },
+                                        { id: 1011, title: '11. Nginx VirtualHost', path: '/play/session/11' },
                                     ].map((item) => {
                                         const completed = isLevelCompleted(item.id);
                                         const unlocked = isLevelUnlocked(item.id); // Simple unlock check

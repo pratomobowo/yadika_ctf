@@ -21,8 +21,6 @@ export const DynamicCTFTerminal: React.FC<DynamicCTFTerminalProps> = ({ level, o
         user: level.user || 'guest',
         hostname: level.hostname || 'ctf',
         levelTitle: `Level ${level.id}: ${level.title}`,
-        customCommands: level.customCommands,
-        initialEnv: level.initialEnv,
         levelId: level.id,
     });
 

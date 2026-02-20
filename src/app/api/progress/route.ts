@@ -62,21 +62,29 @@ export async function POST(request: NextRequest) {
         let pointsToAward = 10;
 
         const levelData = getLevelById(level);
-        if (!levelData) {
-            return NextResponse.json(
-                { error: 'Level tidak valid' },
-                { status: 400 }
-            );
-        }
 
-        correctFlag = levelData.flag;
-        pointsToAward = levelData.points || (level >= 1000 ? 10 : 20);
+        // For tutorial modules (level >= 1000), accept 'MODULE_COMPLETED' as a valid completion signal
+        const isTutorialAutoCompletion = level >= 1000 && flag === 'MODULE_COMPLETED';
 
-        if (flag.toLowerCase() !== correctFlag.toLowerCase()) {
-            return NextResponse.json(
-                { error: 'Flag salah!', correct: false },
-                { status: 400 }
-            );
+        if (!isTutorialAutoCompletion) {
+            if (!levelData) {
+                return NextResponse.json(
+                    { error: 'Level tidak valid' },
+                    { status: 400 }
+                );
+            }
+            correctFlag = levelData.flag;
+            pointsToAward = levelData.points || 20;
+
+            if (flag.toLowerCase() !== correctFlag.toLowerCase()) {
+                return NextResponse.json(
+                    { error: 'Flag salah!', correct: false },
+                    { status: 400 }
+                );
+            }
+        } else {
+            correctFlag = 'MODULE_COMPLETED';
+            pointsToAward = 10;
         }
 
         // Check if already completed
@@ -116,7 +124,24 @@ export async function POST(request: NextRequest) {
         const newBadges = await checkAndAwardBadges(session.id);
 
         // Log activity
-        await logActivity(session.id, 'LEVEL_COMPLETE', `memecahkan Level ${level}: ${levelData.title}!`, 'Flag');
+        const tutorialModuleNames: Record<number, string> = {
+            1001: '1. Install Ubuntu',
+            1002: '2. Basic Commands',
+            1003: '3. File Management',
+            1004: '4. Text Editing & Manipulation',
+            1005: '5. User & Permission Mgmt',
+            1006: '6. Web Server Apache',
+            1007: '7. Nginx Web Server',
+            1008: '8. Setup MySQL',
+            1009: '9. phpMyAdmin Setup',
+            1010: '10. Apache VirtualHost',
+            1011: '11. Nginx VirtualHost',
+        };
+        const levelTitle = levelData ? levelData.title : tutorialModuleNames[level] || `Module ${level}`;
+        const activityMessage = isTutorialAutoCompletion
+            ? `menyelesaikan materi ${levelTitle}!`
+            : `memecahkan CTF Level ${level}: ${levelTitle}!`;
+        await logActivity(session.id, 'LEVEL_COMPLETE', activityMessage, isTutorialAutoCompletion ? 'Tutorial' : 'Flag');
 
         return NextResponse.json({
             success: true,

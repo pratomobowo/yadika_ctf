@@ -9,8 +9,6 @@ interface VFSShellOptions {
     user?: string;
     hostname?: string;
     levelTitle: string;
-    customCommands?: (command: string, args: string[], currentPath: string, addLines: (lines: TerminalLine[]) => void) => boolean;
-    initialEnv?: Record<string, string>;
     levelId: number;
 }
 
@@ -22,7 +20,6 @@ export const useVFSShell = (options: VFSShellOptions) => {
         user = 'guest',
         hostname = 'ctf',
         levelTitle,
-        customCommands,
         levelId
     } = options;
 
@@ -41,7 +38,20 @@ export const useVFSShell = (options: VFSShellOptions) => {
         'PWD': initialPath,
         'PATH': '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
         'LANG': 'en_US.UTF-8',
-        ...(options.initialEnv || {})
+    });
+
+    // Fetch secure environment variables from server (may contain flags)
+    const [envLoaded, setEnvLoaded] = useState(false);
+    useState(() => {
+        fetch(`/api/levels/${levelId}/env`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.env && Object.keys(data.env).length > 0) {
+                    setEnv(prev => ({ ...prev, ...data.env }));
+                }
+                setEnvLoaded(true);
+            })
+            .catch(() => setEnvLoaded(true));
     });
 
     const fetchFileContent = async (path: string): Promise<string | null> => {
@@ -443,10 +453,34 @@ export const useVFSShell = (options: VFSShellOptions) => {
             return;
         }
 
-        // Try custom commands
+        // Try custom commands via server API
         const parts = trimmed.split(/\s+/);
-        if (customCommands && customCommands(parts[0], parts.slice(1), currentPath, shell.addLines)) {
-            return;
+        try {
+            const cmdRes = await fetch(`/api/levels/${levelId}/command`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command: parts[0], args: parts.slice(1), currentPath }),
+            });
+            if (cmdRes.ok) {
+                const cmdData = await cmdRes.json();
+                if (cmdData.handled) {
+                    if (cmdData.lines && cmdData.lines.length > 0) {
+                        shell.addLines(cmdData.lines);
+                        // Check for flags in server response
+                        cmdData.lines.forEach((line: TerminalLine) => {
+                            if (line.text.includes('yadika{')) {
+                                const match = line.text.match(/yadika\{[^}]+\}/);
+                                if (match && onFlagFound) {
+                                    setTimeout(() => onFlagFound(match[0]), 500);
+                                }
+                            }
+                        });
+                    }
+                    return;
+                }
+            }
+        } catch (e) {
+            console.error('Custom command API error:', e);
         }
 
         // Handle Redirection or Pipeline or Single Command
@@ -505,7 +539,7 @@ export const useVFSShell = (options: VFSShellOptions) => {
                 }
             });
         }
-    }, [user, hostname, currentPath, shell, customCommands, initialPath, filesystem, executeSingleCommand, onFlagFound]);
+    }, [user, hostname, currentPath, shell, initialPath, filesystem, executeSingleCommand, onFlagFound, levelId]);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();

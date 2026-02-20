@@ -1050,62 +1050,6 @@ export const ctfLevelData: CTFLevel[] = [
         }
     },
 
-    // ============ SESSIONS (1000+) ============
-    {
-        id: 1001,
-        title: 'Module 1: Install Ubuntu Server',
-        flag: 'yadika{ubuntu_installed_success}',
-        points: 0,
-        hint: '',
-        themeColor: 'primary',
-        themeBorder: 'border-primary/30',
-        themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
-        filesystem: { type: 'directory', children: {} }
-    },
-    {
-        id: 1002,
-        title: 'Module 2: Basic Commands',
-        flag: 'MODULE_COMPLETED',
-        points: 0,
-        hint: '',
-        themeColor: 'primary',
-        themeBorder: 'border-primary/30',
-        themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
-        filesystem: { type: 'directory', children: {} }
-    },
-    {
-        id: 1003,
-        title: 'Module 3: File Management',
-        flag: 'yadika{file_manager_master}',
-        points: 0,
-        hint: '',
-        themeColor: 'primary',
-        themeBorder: 'border-primary/30',
-        themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
-        filesystem: { type: 'directory', children: {} }
-    },
-    {
-        id: 1004,
-        title: 'Module 4: Text Editor (Nano)',
-        flag: 'MODULE_COMPLETED',
-        points: 0,
-        hint: '',
-        themeColor: 'primary',
-        themeBorder: 'border-primary/30',
-        themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
-        filesystem: { type: 'directory', children: {} }
-    },
-    {
-        id: 1005,
-        title: 'Module 5: User & Permission',
-        flag: 'MODULE_COMPLETED',
-        points: 0,
-        hint: '',
-        themeColor: 'primary',
-        themeBorder: 'border-primary/30',
-        themeShadow: 'shadow-[0_0_30px_rgba(34,197,94,0.15)]',
-        filesystem: { type: 'directory', children: {} }
-    },
 ];
 
 // Helper functions

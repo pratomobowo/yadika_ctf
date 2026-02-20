@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [user]);
 
     const skillStats = useMemo(() => {
-        const categories = ['Linux CLI', 'Scripting', 'Networking', 'DevOps', 'Security'];
+        const categories = ['Linux CLI', 'Scripting', 'Networking', 'DevOps', 'Security', 'Sysadmin'];
         const stats = categories.map(cat => {
             const levelsInCategory = ctfLevelData.filter(l => l.category === cat);
             const completedInCategory = user?.progress.filter(p =>
@@ -159,7 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (user?.role === 'ADMIN') return true;
 
         // Session Levels (1001+)
-        if (level >= 1001 && level <= 1005) {
+        if (level >= 1001 && level <= 1020) {
             if (level === 1001) return true; // Sesi 1 unlocked
             return isLevelCompleted(level - 1);
         }
