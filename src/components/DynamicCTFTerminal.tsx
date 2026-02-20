@@ -8,17 +8,18 @@ import { CTFLevel } from '@/lib/ctfLevels';
 interface DynamicCTFTerminalProps {
     level: CTFLevel;
     onFlagFound: (flag: string) => void;
+    username?: string;
 }
 
-export const DynamicCTFTerminal: React.FC<DynamicCTFTerminalProps> = ({ level, onFlagFound }) => {
+export const DynamicCTFTerminal: React.FC<DynamicCTFTerminalProps> = ({ level, onFlagFound, username }) => {
     const {
         lines, input, setInput, handleSubmit, handleHistory,
         scrollRef, inputRef, prompt
     } = useVFSShell({
         initialFilesystem: level.filesystem,
-        initialPath: level.initialPath || '/home/guest',
+        initialPath: level.initialPath || `/home/${username || 'guest'}`,
         onFlagFound,
-        user: level.user || 'guest',
+        user: level.user || username || 'guest',
         hostname: level.hostname || 'ctf',
         levelTitle: `Level ${level.id}: ${level.title}`,
         levelId: level.id,

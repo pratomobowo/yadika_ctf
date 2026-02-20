@@ -5,7 +5,8 @@ import { Terminal as TerminalIcon, Maximize2, Minimize2, X, Play, CheckCircle2 }
 import { useAuth } from '@/context/AuthContext';
 
 export default function PhpMyAdminTerminal({ onComplete }: { onComplete?: () => void }) {
-    const { updateProgress } = useAuth();
+    const { user, updateProgress } = useAuth();
+    const username = user?.discord || 'cadet';
 
     const [history, setHistory] = useState<string[]>([]);
     const [input, setInput] = useState('');
@@ -233,7 +234,7 @@ export default function PhpMyAdminTerminal({ onComplete }: { onComplete?: () => 
         }, 1000);
     };
 
-    let promptPrefix = <><span className="text-green-500 font-bold shrink-0">cadet@ctf:</span><span className="text-blue-400 font-bold shrink-0">~ $</span></>;
+    let promptPrefix = <><span className="text-green-500 font-bold shrink-0">{username}@ctf:</span><span className="text-blue-400 font-bold shrink-0">~ $</span></>;
     if (installStep > 0) promptPrefix = <span className="text-white shrink-0">&gt;</span>;
 
     return (
@@ -242,7 +243,7 @@ export default function PhpMyAdminTerminal({ onComplete }: { onComplete?: () => 
             <div className="flex items-center justify-between px-4 py-2 bg-[#1a1a1c] border-b border-white/5 select-none shrink-0">
                 <div className="flex items-center gap-2 text-white/60">
                     <TerminalIcon size={14} />
-                    <span className="text-xs font-bold">cadet@ctf:~</span>
+                    <span className="text-xs font-bold">{username}@ctf:~</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={() => setIsMaximized(!isMaximized)} className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors">

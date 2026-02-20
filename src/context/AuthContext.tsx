@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { ctfLevelData } from '@/lib/ctfLevels';
+import { ctfLevels as ctfLevelData } from '@/lib/ctfLevels';
 
 interface Progress {
     level: number;

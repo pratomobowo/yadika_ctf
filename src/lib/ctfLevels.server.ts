@@ -1,5 +1,6 @@
 import { FileNode } from './vfsUtils';
 import { TerminalLine } from '@/hooks/useTerminalShell';
+import { mediumCtfLevels } from './ctfLevels.medium.server';
 
 export interface CTFLevel {
     id: number;
@@ -1052,13 +1053,15 @@ export const ctfLevelData: CTFLevel[] = [
 
 ];
 
-// Helper functions
-export const getLevelById = (id: number): CTFLevel | undefined => ctfLevelData.find(l => l.id === id);
+// Helper functions — use merged array
+const allCtfLevels = [...ctfLevelData, ...mediumCtfLevels];
 
-export const getAllLevelMeta = () => ctfLevelData.map(l => ({ id: l.id, title: l.title, points: l.points }));
+export const getLevelById = (id: number): CTFLevel | undefined => allCtfLevels.find(l => l.id === id);
+
+export const getAllLevelMeta = () => allCtfLevels.map(l => ({ id: l.id, title: l.title, points: l.points }));
 
 export const getAllFlags = (): Record<number, string> => {
     const flags: Record<number, string> = {};
-    ctfLevelData.forEach(l => { flags[l.id] = l.flag; });
+    allCtfLevels.forEach(l => { flags[l.id] = l.flag; });
     return flags;
 };

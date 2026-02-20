@@ -46,9 +46,9 @@ const SidebarItem = ({ href, icon: Icon, label, active, locked, completed }: Sid
     );
 };
 
-import { ctfLevelData } from '@/lib/ctfLevels';
+import { ctfLevels as allCtfLevels } from '@/lib/ctfLevels';
 
-const ctfLevels = ctfLevelData.map(l => ({ id: l.id, title: l.title }));
+const ctfLevels = allCtfLevels.map(l => ({ id: l.id, title: l.title }));
 
 
 
@@ -57,6 +57,7 @@ export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
     const { user, isLevelCompleted, isLevelUnlocked, logout } = useAuth();
     const [isSessionsOpen, setIsSessionsOpen] = useState(true);
     const [isEasyOpen, setIsEasyOpen] = useState(false);
+    const [isMediumOpen, setIsMediumOpen] = useState(false);
     const [isNormalOpen, setIsNormalOpen] = useState(false);
     const [isHardOpen, setIsHardOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -235,7 +236,7 @@ export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
                                         exit={{ height: 0, opacity: 0 }}
                                         className="flex flex-col gap-1 pl-4 overflow-hidden"
                                     >
-                                        {ctfLevels.slice(0, 20).map((lvl) => {
+                                        {ctfLevels.filter(l => l.id >= 1 && l.id <= 50).map((lvl) => {
                                             const completed = isLevelCompleted(lvl.id);
                                             const unlocked = isLevelUnlocked(lvl.id);
                                             const isCurrent = lvl.id === currentLevel;
@@ -287,15 +288,76 @@ export function Sidebar({ currentLevel, isOpen, onClose }: SidebarProps) {
                             </AnimatePresence>
                         </div>
 
-                        {/* NORMAL SECTION (LOCKED) */}
+                        {/* MEDIUM SECTION */}
                         <div className="flex flex-col gap-1">
-                            <div className="flex items-center justify-between gap-2 px-2 py-2 text-foreground/20 cursor-not-allowed grayscale rounded-md">
+                            <button
+                                onClick={() => setIsMediumOpen(!isMediumOpen)}
+                                className="flex items-center justify-between gap-2 px-2 py-2 text-foreground/60 hover:text-amber-400 transition-colors hover:bg-white/5 rounded-md group"
+                            >
                                 <div className="flex items-center gap-2">
-                                    <Lock size={14} />
-                                    <span className="text-[11px] font-bold font-mono uppercase">Difficulty: Normal</span>
+                                    <ChevronRight size={14} className={`transition-transform duration-200 ${isMediumOpen ? 'rotate-90' : ''}`} />
+                                    <span className="text-[11px] font-bold font-mono uppercase">Difficulty: Medium</span>
                                 </div>
-                                <span className="text-[9px] font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5">LOCKED</span>
-                            </div>
+                            </button>
+
+                            <AnimatePresence>
+                                {isMediumOpen && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        className="flex flex-col gap-1 pl-4 overflow-hidden"
+                                    >
+                                        {ctfLevels.filter(l => l.id >= 51 && l.id <= 100).map((lvl) => {
+                                            const completed = isLevelCompleted(lvl.id);
+                                            const unlocked = isLevelUnlocked(lvl.id);
+                                            const isCurrent = lvl.id === currentLevel;
+
+                                            const itemContent = (
+                                                <>
+                                                    {completed ? (
+                                                        <CheckCircle2 size={12} className="text-green-500 shrink-0" />
+                                                    ) : unlocked ? (
+                                                        <Circle size={12} className="shrink-0" />
+                                                    ) : (
+                                                        <Lock size={12} className="text-foreground/20 shrink-0" />
+                                                    )}
+                                                    <span className="text-[11px] font-mono truncate">
+                                                        Lvl {lvl.id}: {lvl.title}
+                                                    </span>
+                                                </>
+                                            );
+
+                                            if (!unlocked && !isCurrent) {
+                                                return (
+                                                    <div
+                                                        key={lvl.id}
+                                                        className="flex items-center gap-2 p-1.5 rounded-md text-foreground/20 cursor-not-allowed grayscale"
+                                                        title="Selesaikan level sebelumnya untuk membuka"
+                                                    >
+                                                        {itemContent}
+                                                    </div>
+                                                );
+                                            }
+
+                                            return (
+                                                <Link
+                                                    key={lvl.id}
+                                                    href={`/play/${lvl.id}`}
+                                                    className={`flex items-center gap-2 p-1.5 rounded-md transition-colors ${isCurrent
+                                                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                                                        : completed
+                                                            ? 'text-green-400/70 hover:bg-white/5'
+                                                            : 'text-foreground/60 hover:bg-white/5 hover:text-foreground'
+                                                        }`}
+                                                >
+                                                    {itemContent}
+                                                </Link>
+                                            );
+                                        })}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         {/* HARD SECTION (LOCKED) */}

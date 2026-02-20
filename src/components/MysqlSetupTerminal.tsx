@@ -5,7 +5,8 @@ import { Terminal as TerminalIcon, Maximize2, Minimize2, X, Play, CheckCircle2 }
 import { useAuth } from '@/context/AuthContext';
 
 export default function MysqlSetupTerminal({ onComplete }: { onComplete?: () => void }) {
-    const { updateProgress } = useAuth();
+    const { user, updateProgress } = useAuth();
+    const username = user?.discord || 'cadet';
 
     const [history, setHistory] = useState<string[]>([]);
     const [input, setInput] = useState('');
@@ -292,7 +293,7 @@ export default function MysqlSetupTerminal({ onComplete }: { onComplete?: () => 
     };
 
     // Determine prefix
-    let promptPrefix = <><span className="text-green-500 font-bold shrink-0">cadet@ctf:</span><span className="text-blue-400 font-bold shrink-0">~ $</span></>;
+    let promptPrefix = <><span className="text-green-500 font-bold shrink-0">{username}@ctf:</span><span className="text-blue-400 font-bold shrink-0">~ $</span></>;
     if (isMysqlPrompt) promptPrefix = <span className="text-white font-bold shrink-0">mysql&gt;</span>;
     if (waitingForMysqlPass) promptPrefix = <span className="text-white shrink-0">Enter password:</span>;
     if (secureInstallStep > 0) promptPrefix = <span className="text-white shrink-0">&gt;</span>;
@@ -303,7 +304,7 @@ export default function MysqlSetupTerminal({ onComplete }: { onComplete?: () => 
             <div className="flex items-center justify-between px-4 py-2 bg-[#1a1a1c] border-b border-white/5 select-none shrink-0">
                 <div className="flex items-center gap-2 text-white/60">
                     <TerminalIcon size={14} />
-                    <span className="text-xs font-bold">cadet@ctf:~</span>
+                    <span className="text-xs font-bold">{username}@ctf:~</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={() => setIsMaximized(!isMaximized)} className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors">
@@ -337,7 +338,7 @@ export default function MysqlSetupTerminal({ onComplete }: { onComplete?: () => 
                     <div key={i} className={`text-[10px] md:text-sm break-all font-mono ${line.type === 'success' ? 'text-green-400' : 'text-white/80'}`}>
                         {line.type === 'command' ? (
                             <div className="flex gap-2 text-white">
-                                {line.content === '********' ? <span className="text-white shrink-0">Enter password:</span> : (line.content === 'QUIT' ? <span className="text-white font-bold shrink-0">mysql&gt;</span> : <><span className="text-green-500 font-bold shrink-0">cadet@ctf:</span><span className="text-blue-400 font-bold shrink-0">~ $</span></>)}
+                                {line.content === '********' ? <span className="text-white shrink-0">Enter password:</span> : (line.content === 'QUIT' ? <span className="text-white font-bold shrink-0">mysql&gt;</span> : <><span className="text-green-500 font-bold shrink-0">{username}@ctf:</span><span className="text-blue-400 font-bold shrink-0">~ $</span></>)}
                                 <span>{line.content}</span>
                             </div>
                         ) : (

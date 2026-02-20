@@ -93,7 +93,7 @@ export default function DynamicLevelPage({ params }: { params: Promise<{ level: 
                 )}
 
                 <div className="flex-1 p-3 md:p-4 overflow-hidden">
-                    <DynamicCTFTerminal level={levelData} onFlagFound={handleFlagFound} />
+                    <DynamicCTFTerminal level={levelData} onFlagFound={handleFlagFound} username={user?.discord} />
                 </div>
 
                 <div className="px-3 md:px-4 py-2 md:py-3 border-t border-white/5">

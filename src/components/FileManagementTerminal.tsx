@@ -44,7 +44,8 @@ const INITIAL_FS: FileSystemNode[] = [
 ];
 
 export default function FileManagementTerminal({ onComplete }: { onComplete?: () => void }) {
-    const { updateProgress } = useAuth();
+    const { user, updateProgress } = useAuth();
+    const username = user?.discord || 'cadet';
     const [history, setHistory] = useState<string[]>([]);
     const [input, setInput] = useState('');
     const [output, setOutput] = useState<{ type: 'command' | 'response'; content: React.ReactNode }[]>([]);
@@ -391,7 +392,7 @@ export default function FileManagementTerminal({ onComplete }: { onComplete?: ()
             <div className="flex items-center justify-between px-4 py-2 bg-[#1a1a1c] border-b border-white/5 select-none shrink-0">
                 <div className="flex items-center gap-2 text-white/60">
                     <TerminalIcon size={14} />
-                    <span className="text-xs font-bold">cadet@ctf:~/documents</span>
+                    <span className="text-xs font-bold">{username}@ctf:~/documents</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <button onClick={() => setIsMaximized(!isMaximized)} className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors">
@@ -429,7 +430,7 @@ export default function FileManagementTerminal({ onComplete }: { onComplete?: ()
                     <div key={i} className="text-[10px] md:text-sm break-all font-mono">
                         {line.type === 'command' ? (
                             <div className="flex gap-2 text-white">
-                                <span className="text-green-500 font-bold shrink-0">cadet@ctf:</span>
+                                <span className="text-green-500 font-bold shrink-0">{username}@ctf:</span>
                                 <span className="text-blue-400 font-bold shrink-0">{cwd[cwd.length - 1] === 'cadet' ? '~' : `~/${cwd.slice(2).join('/')}`} $</span>
                                 <span>{line.content}</span>
                             </div>
@@ -443,7 +444,7 @@ export default function FileManagementTerminal({ onComplete }: { onComplete?: ()
 
                 {/* Active Input */}
                 <div className="flex gap-2 text-[10px] md:text-sm text-white font-mono items-center">
-                    <span className="text-green-500 font-bold shrink-0">cadet@ctf:</span>
+                    <span className="text-green-500 font-bold shrink-0">{username}@ctf:</span>
                     <span className="text-blue-400 font-bold shrink-0">{cwd[cwd.length - 1] === 'cadet' ? '~' : `~/${cwd.slice(2).join('/')}`} $</span>
                     <form onSubmit={handleCommand} className="flex-1">
                         <input

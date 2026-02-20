@@ -55,7 +55,7 @@ export const UnifiedTerminal: React.FC<UnifiedTerminalProps> = ({
 
     return (
         <div
-            className={`w-full bg-[#0d0d0f] border ${themeBorder} rounded-lg overflow-hidden ${themeShadow} cursor-text`}
+            className={`w-full h-full flex flex-col bg-[#0d0d0f] border ${themeBorder} rounded-lg overflow-hidden ${themeShadow} cursor-text`}
             onClick={() => inputRef.current?.focus()}
         >
             <div className={`bg-[#1a1a1c] px-3 md:px-4 py-1.5 md:py-2 border-b ${themeBorder.replace('/30', '/20')} flex items-center justify-between`}>
@@ -72,7 +72,7 @@ export const UnifiedTerminal: React.FC<UnifiedTerminalProps> = ({
 
             <div
                 ref={scrollRef}
-                className="p-3 md:p-4 h-[320px] md:h-[350px] overflow-y-auto font-mono text-[10px] md:text-sm terminal-scrollbar bg-[#0a0a0c]"
+                className="p-3 md:p-4 flex-1 overflow-y-auto font-mono text-[10px] md:text-sm terminal-scrollbar bg-[#0a0a0c]"
             >
                 {lines.map((line, i) => (
                     <motion.div

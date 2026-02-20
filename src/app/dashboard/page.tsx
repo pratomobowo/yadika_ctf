@@ -11,7 +11,7 @@ import {
     User, Settings, Menu, X, Rocket, ShieldCheck, Globe,
     Package, Cpu, Zap, Wand, Award, Star, BookOpen, ArrowRight, Circle, Lock, Medal
 } from 'lucide-react';
-import { ctfLevelData } from '@/lib/ctfLevels';
+import { ctfLevels as ctfLevelData } from '@/lib/ctfLevels';
 import DailyQuizCard from '@/components/DailyQuizCard';
 import ActivityFeed from '@/components/ActivityFeed';
 
@@ -22,6 +22,17 @@ const sessionModules = [
     { level: 1004, title: 'Text Editing (Nano)', href: '/play/session/4' },
     { level: 1005, title: 'User & Permission', href: '/play/session/5' },
 ];
+
+const industryModules = [
+    { level: 1006, title: 'Web Server Apache', href: '/play/session/6' },
+    { level: 1007, title: 'Nginx Web Server', href: '/play/session/7' },
+    { level: 1008, title: 'Setup MySQL', href: '/play/session/8' },
+    { level: 1009, title: 'phpMyAdmin Setup', href: '/play/session/9' },
+    { level: 1010, title: 'Apache VirtualHost', href: '/play/session/10' },
+    { level: 1011, title: 'Nginx VirtualHost', href: '/play/session/11' },
+];
+
+const allModules = [...sessionModules, ...industryModules];
 
 const ctfLevels = ctfLevelData.map(l => ({
     level: l.id,
@@ -72,15 +83,15 @@ export default function DashboardPage() {
         );
     }
 
-    const totalModules = sessionModules.length;
-    const completedModules = sessionModules.filter(m => isLevelCompleted(m.level)).length;
+    const totalModules = allModules.length;
+    const completedModules = allModules.filter(m => isLevelCompleted(m.level)).length;
     const totalCTF = ctfLevels.length;
     const completedCTF = ctfLevels.filter(c => isLevelCompleted(c.level)).length;
     const totalProgress = completedModules + completedCTF;
     const totalAll = totalModules + totalCTF;
     const progressPercent = Math.round((totalProgress / totalAll) * 100);
 
-    const nextModule = sessionModules.find(m => isLevelUnlocked(m.level) && !isLevelCompleted(m.level));
+    const nextModule = allModules.find(m => isLevelUnlocked(m.level) && !isLevelCompleted(m.level));
     const nextCTF = ctfLevels.find(c => isLevelUnlocked(c.level) && !isLevelCompleted(c.level));
     const nextAction = nextModule || nextCTF;
 
@@ -169,30 +180,66 @@ export default function DashboardPage() {
                         className="bg-white/5 border border-white/10 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-3">
                             <BookOpen size={16} className="text-blue-400" />
-                            <h3 className="font-bold font-mono text-xs">Materi Industri</h3>
+                            <h3 className="font-bold font-mono text-xs">Materi Pembelajaran</h3>
                             <span className="ml-auto text-[10px] text-foreground/30 font-mono">{completedModules}/{totalModules}</span>
                         </div>
-                        <div className="space-y-1.5">
-                            {sessionModules.map((mod) => {
-                                const completed = isLevelCompleted(mod.level);
-                                const unlocked = isLevelUnlocked(mod.level);
-                                return (
-                                    <Link key={mod.level} href={unlocked ? mod.href : '#'}
-                                        className={`flex items-center gap-3 p-2.5 rounded-md border transition-all text-xs ${completed ? 'border-green-500/20 bg-green-500/5'
-                                            : unlocked ? 'border-white/10 bg-white/5 hover:bg-white/10'
-                                                : 'border-white/5 bg-white/[0.02] opacity-40 pointer-events-none'
-                                            }`}>
-                                        <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${completed ? 'bg-green-500' : unlocked ? 'bg-primary/40' : 'bg-white/10'}`} />
-                                        <div className="flex-1 min-w-0">
-                                            <span className="font-mono text-foreground/80 truncate block">{mod.title}</span>
-                                            <span className="text-[10px] text-foreground/30 font-mono">+10 pts</span>
-                                        </div>
-                                        {completed ? <CheckCircle2 size={14} className="text-green-500 shrink-0" />
-                                            : unlocked ? <Circle size={14} className="text-white/20 shrink-0" />
-                                                : <Lock size={12} className="text-foreground/20 shrink-0" />}
-                                    </Link>
-                                );
-                            })}
+                        <div className="max-h-[300px] overflow-y-auto terminal-scrollbar pr-1 pb-1">
+                            {/* Materi Dasar sub-section */}
+                            <div className="flex items-center gap-2 mb-3">
+                                <h4 className="font-bold font-mono text-[10px] text-foreground/50 uppercase tracking-wider">Materi Dasar</h4>
+                                <div className="h-px bg-white/5 flex-1" />
+                            </div>
+                            <div className="space-y-1.5">
+                                {sessionModules.map((mod) => {
+                                    const completed = isLevelCompleted(mod.level);
+                                    const unlocked = isLevelUnlocked(mod.level);
+                                    return (
+                                        <Link key={mod.level} href={unlocked ? mod.href : '#'}
+                                            className={`flex items-center gap-3 p-2.5 rounded-md border transition-all text-xs ${completed ? 'border-green-500/20 bg-green-500/5'
+                                                : unlocked ? 'border-white/10 bg-white/5 hover:bg-white/10'
+                                                    : 'border-white/5 bg-white/[0.02] opacity-40 pointer-events-none'
+                                                }`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${completed ? 'bg-green-500' : unlocked ? 'bg-primary/40' : 'bg-white/10'}`} />
+                                            <div className="flex-1 min-w-0">
+                                                <span className="font-mono text-foreground/80 truncate block">{mod.title}</span>
+                                                <span className="text-[10px] text-foreground/30 font-mono">+10 pts</span>
+                                            </div>
+                                            {completed ? <CheckCircle2 size={14} className="text-green-500 shrink-0" />
+                                                : unlocked ? <Circle size={14} className="text-white/20 shrink-0" />
+                                                    : <Lock size={12} className="text-foreground/20 shrink-0" />}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Materi Industri sub-section */}
+                            <div className="flex items-center gap-2 mt-5 mb-3">
+                                <Globe size={12} className="text-orange-400/80" />
+                                <h4 className="font-bold font-mono text-[10px] text-orange-400/80 uppercase tracking-wider">Materi Industri</h4>
+                                <div className="h-px bg-white/5 flex-1" />
+                            </div>
+                            <div className="space-y-1.5">
+                                {industryModules.map((mod) => {
+                                    const completed = isLevelCompleted(mod.level);
+                                    const unlocked = isLevelUnlocked(mod.level);
+                                    return (
+                                        <Link key={mod.level} href={unlocked ? mod.href : '#'}
+                                            className={`flex items-center gap-3 p-2.5 rounded-md border transition-all text-xs ${completed ? 'border-green-500/20 bg-green-500/5'
+                                                : unlocked ? 'border-orange-500/10 bg-orange-500/5 hover:bg-orange-500/10'
+                                                    : 'border-white/5 bg-white/[0.02] opacity-40 pointer-events-none'
+                                                }`}>
+                                            <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${completed ? 'bg-green-500' : unlocked ? 'bg-orange-400/40' : 'bg-white/10'}`} />
+                                            <div className="flex-1 min-w-0">
+                                                <span className="font-mono text-foreground/80 truncate block">{mod.title}</span>
+                                                <span className="text-[10px] text-foreground/30 font-mono">+10 pts</span>
+                                            </div>
+                                            {completed ? <CheckCircle2 size={14} className="text-green-500 shrink-0" />
+                                                : unlocked ? <Circle size={14} className="text-orange-400/30 shrink-0" />
+                                                    : <Lock size={12} className="text-foreground/20 shrink-0" />}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </motion.div>
 
