@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import {
     Users, Search, Filter, MoreVertical, Edit2,
     Trash2, RotateCcw, Shield, CheckCircle2,
-    Clock, Medal, X, Save, AlertTriangle, Download, Brain, KeyRound
+    Clock, Medal, X, Save, AlertTriangle, Download, Brain, KeyRound, Eye, Circle, Lock, BookOpen, Flag, Globe
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { getAllLevelMeta } from '@/lib/ctfLevels';
 
 interface User {
     id: string;
@@ -19,6 +20,41 @@ interface User {
     completedCount: number;
 }
 
+interface ProgressEntry {
+    level: number;
+    completedAt: string;
+}
+
+interface ProgressDetail {
+    id: string;
+    fullName: string;
+    discord: string;
+    points: number;
+    progress: ProgressEntry[];
+}
+
+// Module & CTF definitions for display
+const MATERI_DASAR = [
+    { level: 1001, title: 'Instalasi Ubuntu Server' },
+    { level: 1002, title: 'Basic Commands' },
+    { level: 1003, title: 'File Management' },
+    { level: 1004, title: 'Text Editing (Nano)' },
+    { level: 1005, title: 'User & Permission' },
+];
+
+const MATERI_INDUSTRI = [
+    { level: 1006, title: 'Web Server Apache' },
+    { level: 1007, title: 'Nginx Web Server' },
+    { level: 1008, title: 'Setup MySQL' },
+    { level: 1009, title: 'phpMyAdmin Setup' },
+    { level: 1010, title: 'Apache VirtualHost' },
+    { level: 1011, title: 'Nginx VirtualHost' },
+];
+
+const allCtfMeta = getAllLevelMeta();
+const CTF_EASY = allCtfMeta.filter(l => l.id >= 1 && l.id <= 50);
+const CTF_MEDIUM = allCtfMeta.filter(l => l.id >= 51);
+
 export default function UserManagementPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,6 +65,8 @@ export default function UserManagementPage() {
     const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
     const [newPassword, setNewPassword] = useState('');
     const [resetMessage, setResetMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [progressDetail, setProgressDetail] = useState<ProgressDetail | null>(null);
+    const [loadingProgress, setLoadingProgress] = useState(false);
 
     // Pagination state
     const [currentPage, setCurrentPage] = useState(1);
@@ -284,6 +322,22 @@ export default function UserManagementPage() {
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <button
+                                                onClick={async () => {
+                                                    setLoadingProgress(true);
+                                                    setProgressDetail(null);
+                                                    try {
+                                                        const res = await fetch(`/api/admin/users/${u.id}/progress`);
+                                                        const data = await res.json();
+                                                        if (res.ok) setProgressDetail(data.user);
+                                                    } catch { /* ignore */ }
+                                                    setLoadingProgress(false);
+                                                }}
+                                                className="p-1.5 hover:text-green-400 transition-colors"
+                                                title="Lihat Progress"
+                                            >
+                                                <Eye size={14} />
+                                            </button>
+                                            <button
                                                 onClick={() => setEditingUser(u)}
                                                 className="p-1.5 hover:text-white transition-colors"
                                             >
@@ -517,6 +571,137 @@ export default function UserManagementPage() {
                                     {actionLoading === 'resetting-pw' ? 'RESETTING...' : 'RESET PASSWORD'}
                                 </button>
                             </form>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Progress Detail Modal */}
+            <AnimatePresence>
+                {(progressDetail || loadingProgress) && (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                            onClick={() => { setProgressDetail(null); setLoadingProgress(false); }}
+                        />
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+                            className="relative w-full max-w-lg bg-[#0d0d0f] border border-green-500/20 rounded-xl p-6 shadow-2xl max-h-[80vh] overflow-y-auto"
+                        >
+                            {loadingProgress ? (
+                                <div className="text-center py-8">
+                                    <div className="text-foreground/40 font-mono text-sm animate-pulse">Memuat progress...</div>
+                                </div>
+                            ) : progressDetail ? (
+                                <>
+                                    <div className="flex items-center justify-between mb-5">
+                                        <div>
+                                            <h2 className="text-sm font-black font-mono uppercase tracking-widest text-green-400">Progress Detail</h2>
+                                            <p className="text-[11px] font-mono text-foreground/40 mt-1">
+                                                {progressDetail.fullName} · <span className="text-primary">@{progressDetail.discord}</span> · <span className="text-amber-400">{progressDetail.points} pts</span>
+                                            </p>
+                                        </div>
+                                        <button onClick={() => setProgressDetail(null)} className="text-foreground/40 hover:text-white"><X size={20} /></button>
+                                    </div>
+
+                                    {/* Materi Dasar */}
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <BookOpen size={12} className="text-blue-400" />
+                                            <span className="text-[10px] font-mono font-bold text-foreground/50 uppercase tracking-wider">Materi Dasar</span>
+                                            <span className="text-[10px] font-mono text-foreground/20">
+                                                {MATERI_DASAR.filter(m => progressDetail.progress.some(p => p.level === m.level)).length}/{MATERI_DASAR.length}
+                                            </span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            {MATERI_DASAR.map(mod => {
+                                                const done = progressDetail.progress.find(p => p.level === mod.level);
+                                                return (
+                                                    <div key={mod.level} className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-mono ${done ? 'bg-green-500/5 border border-green-500/10' : 'bg-white/[0.02] border border-white/5 opacity-50'}`}>
+                                                        {done ? <CheckCircle2 size={12} className="text-green-500 shrink-0" /> : <Circle size={12} className="text-white/15 shrink-0" />}
+                                                        <span className="flex-1 text-foreground/70">{mod.title}</span>
+                                                        {done && <span className="text-[9px] text-foreground/20">{new Date(done.completedAt).toLocaleDateString()}</span>}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* Materi Industri */}
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Globe size={12} className="text-orange-400" />
+                                            <span className="text-[10px] font-mono font-bold text-orange-400/80 uppercase tracking-wider">Materi Industri</span>
+                                            <span className="text-[10px] font-mono text-foreground/20">
+                                                {MATERI_INDUSTRI.filter(m => progressDetail.progress.some(p => p.level === m.level)).length}/{MATERI_INDUSTRI.length}
+                                            </span>
+                                        </div>
+                                        <div className="space-y-1">
+                                            {MATERI_INDUSTRI.map(mod => {
+                                                const done = progressDetail.progress.find(p => p.level === mod.level);
+                                                return (
+                                                    <div key={mod.level} className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-mono ${done ? 'bg-green-500/5 border border-green-500/10' : 'bg-white/[0.02] border border-white/5 opacity-50'}`}>
+                                                        {done ? <CheckCircle2 size={12} className="text-green-500 shrink-0" /> : <Circle size={12} className="text-white/15 shrink-0" />}
+                                                        <span className="flex-1 text-foreground/70">{mod.title}</span>
+                                                        {done && <span className="text-[9px] text-foreground/20">{new Date(done.completedAt).toLocaleDateString()}</span>}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* CTF Easy */}
+                                    <div className="mb-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <Flag size={12} className="text-green-400" />
+                                            <span className="text-[10px] font-mono font-bold text-green-400/80 uppercase tracking-wider">CTF Easy</span>
+                                            <span className="text-[10px] font-mono text-foreground/20">
+                                                {CTF_EASY.filter(m => progressDetail.progress.some(p => p.level === m.id)).length}/{CTF_EASY.length}
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-5 md:grid-cols-6 gap-1.5">
+                                            {CTF_EASY.map(ctf => {
+                                                const done = progressDetail.progress.find(p => p.level === ctf.id);
+                                                return (
+                                                    <div key={ctf.id}
+                                                        className={`flex flex-col items-center justify-center p-1.5 rounded text-[9px] font-mono ${done ? 'bg-green-500/10 border border-green-500/20 text-green-400' : 'bg-white/[0.02] border border-white/5 text-foreground/15'}`}
+                                                        title={`${ctf.title}${done ? ` — Selesai: ${new Date(done.completedAt).toLocaleDateString()}` : ''}`}
+                                                    >
+                                                        <span className="font-bold">{ctf.id}</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+
+                                    {/* CTF Medium */}
+                                    {CTF_MEDIUM.length > 0 && (
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Flag size={12} className="text-amber-400" />
+                                                <span className="text-[10px] font-mono font-bold text-amber-400/80 uppercase tracking-wider">CTF Medium</span>
+                                                <span className="text-[10px] font-mono text-foreground/20">
+                                                    {CTF_MEDIUM.filter(m => progressDetail.progress.some(p => p.level === m.id)).length}/{CTF_MEDIUM.length}
+                                                </span>
+                                            </div>
+                                            <div className="space-y-1">
+                                                {CTF_MEDIUM.map(ctf => {
+                                                    const done = progressDetail.progress.find(p => p.level === ctf.id);
+                                                    return (
+                                                        <div key={ctf.id} className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-xs font-mono ${done ? 'bg-amber-500/5 border border-amber-500/10' : 'bg-white/[0.02] border border-white/5 opacity-50'}`}>
+                                                            {done ? <CheckCircle2 size={12} className="text-amber-400 shrink-0" /> : <Circle size={12} className="text-white/15 shrink-0" />}
+                                                            <span className="text-foreground/30 text-[10px] w-5">#{ctf.id}</span>
+                                                            <span className="flex-1 text-foreground/70">{ctf.title}</span>
+                                                            {done && <span className="text-[9px] text-foreground/20">{new Date(done.completedAt).toLocaleDateString()}</span>}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            ) : null}
                         </motion.div>
                     </div>
                 )}
