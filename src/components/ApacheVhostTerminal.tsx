@@ -217,9 +217,10 @@ export default function ApacheVhostTerminal({ onComplete }: { onComplete?: () =>
     };
 
     const handleEditorExit = () => {
+        handleEditorSave();
         setIsEditorOpen(false);
         setOutput(prev => [...prev]);
-        if (step === 2 && vhostCreated) {
+        if (step === 2 && (vhostCreated || editorFilename === 'web1.conf')) {
             completeStep();
         }
     };

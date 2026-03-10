@@ -111,7 +111,7 @@ export default function TextEditorTerminal({ onComplete }: { onComplete?: () => 
             check: (_: string, currentFs: FileSystemNode[]) => {
                 const dir = getDir(currentFs, ['home', 'cadet', 'system_configs']);
                 const file = dir?.children?.find(c => c.name === 'webserver.conf');
-                return !!(file && file.content?.includes('PORT=8080'));
+                return !!(file && file.content && /PORT\s*=\s*8080/i.test(file.content));
             }
         },
         {
@@ -126,7 +126,12 @@ export default function TextEditorTerminal({ onComplete }: { onComplete?: () => 
         if (!isEditorOpen && scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [output, isEditorOpen]);
+
+        // Auto-complete Step 2 if they exited nano very quickly and are stuck
+        if (!isEditorOpen && step === 2 && !isStepCompleted) {
+            completeStep();
+        }
+    }, [output, isEditorOpen, step, isStepCompleted]);
 
     useEffect(() => {
         if (!isEditorOpen) inputRef.current?.focus();
@@ -296,11 +301,12 @@ export default function TextEditorTerminal({ onComplete }: { onComplete?: () => 
     };
 
     const handleEditorExit = () => {
+        handleEditorSave(); // Auto-save to prevent students from losing work if they hit exit without saving
         setIsEditorOpen(false);
         setOutput(prev => [...prev]); // Force re-render/focus
 
         // Validation for Step 2 (Exit Nano)
-        if (step === 2) {
+        if (step === 2 && !isStepCompleted) {
             completeStep();
         }
     };
